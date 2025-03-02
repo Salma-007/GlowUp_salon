@@ -5,32 +5,29 @@
                 </div>
                 <div class="flex-1 flex flex-col overflow-y-auto">
                     <nav class="flex-1 p-4 space-y-1">
-                        <a href="#" class="bg-pink-100 text-pink-600 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
+                        <a href="/admin/dashboard" class="bg-pink-100 text-pink-600 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
                             <i class="fas fa-tachometer-alt mr-3 text-pink-500"></i>
                             Tableau de bord
                         </a>
-                        <a href="#" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
+                        <a href="/admin/clients" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
                             <i class="fas fa-users mr-3 text-gray-400"></i>
                             Gestion des clients
                         </a>
-                        <a href="#" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
+                        <a href="/admin/employees" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
                             <i class="fas fa-user-tie mr-3 text-gray-400"></i>
                             Gestion des employés
                         </a>
-                        <a href="#" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
+                        <a href="/admin/services" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
                             <i class="fas fa-cogs mr-3 text-gray-400"></i>
                             Gestion des services
                         </a>
-                        <a href="#" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
+                        <a href="/admin/reservations" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
                             <i class="fas fa-calendar-alt mr-3 text-gray-400"></i>
                             Gestion des réservations
                         </a>
                         <div class="pt-8">
                             <div class="space-y-1">
-                                <a href="#" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
-                                    <i class="fas fa-question-circle mr-3 text-gray-400"></i>
-                                    Aide & Support
-                                </a>
+
                                 <a href="#" class="text-gray-600 hover:bg-gray-100 group flex items-center px-4 py-3 text-sm font-medium rounded-md">
                                     <i class="fas fa-sign-out-alt mr-3 text-gray-400"></i>
                                     Déconnexion
