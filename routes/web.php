@@ -20,17 +20,45 @@ Route::get('/client/dashboard', function () {
 });
 
 Route::get('/admin/employees', function () {
-    return view('admin.employee-manage');
+    return view('admin.employees.employee-manage');
 });
 
 Route::get('/admin/clients', function () {
-    return view('admin.clients-manage');
+    return view('admin.clients.clients-manage');
 });
 
 Route::get('/admin/services', function () {
-    return view('admin.services-manage');
+    return view('admin.services.services-manage');
+});
+
+Route::get('/admin/add-service', function () {
+    return view('admin.services.add-service');
 });
 
 Route::get('/admin/reservations', function () {
-    return view('admin.reservations-manage');
+    return view('admin.reservations.reservations-manage');
 });
+
+// auth
+Route::get('/login', function () {
+    return view('auth.login');
+});
+Route::get('/register', function () {
+    return view('auth.register');
+});
+
+Route::get('/confirm-mail', function () {
+    return view('auth.confirm-mail');
+});
+
+Route::get('/forgetpassword', function () {
+    return view('auth.recoverpw');
+});
+
+Route::get('/reset-password', function () {
+    return view('auth.reset-password');
+});
+
+Route::get('/dashboard', function () {
+    return view('admin.dashboard');
+})->name('dashboard');
