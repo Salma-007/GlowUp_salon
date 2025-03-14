@@ -7,6 +7,6 @@ use App\Http\Requests\RegisterRequest;
 interface AuthRepositoryInterface
 {
     public function register(array $data);
-    // public function login(array $credentials);
+    public function login(array $data);
     // public function logout($user);
 }

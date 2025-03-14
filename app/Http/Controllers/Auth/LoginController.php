@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterRequest;
 
-class AuthController extends Controller
+class LoginController extends Controller
 {
     public function login(LoginRequest $request){
 
@@ -43,32 +43,4 @@ class AuthController extends Controller
         }
     }
 
-    public function createUser(RegisterRequest $request){
-
-        try{
-            $validated = $request->validated();
-
-            $email = $validated['email'];
-            $password = $validated['password'];
-            $name = $validated['name'];
-
-            $user = User::create([
-                'name' => $name,
-                'email' => $email,
-                'password' => Hash::make($password)
-            ]);
-
-            return response()->json([
-                'status' => true,
-                'message' => 'User Created Successfully',
-                'token' => $user->createToken("API TOKEN")->plainTextToken
-            ], 200);
-
-        }catch(\Throwable $th){
-            return response()->json([
-                'status' => false,
-                'message' => $th->getMessage()
-            ], 500);
-        }
-    }
 }

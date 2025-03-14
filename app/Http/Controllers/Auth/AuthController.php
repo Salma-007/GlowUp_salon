@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
 use App\Interfaces\AuthRepositoryInterface;
@@ -19,6 +20,10 @@ class AuthController extends Controller
     public function index(){
         return view("auth.register");
     }
+    
+    public function loginpage(){
+        return view("auth.login");
+    }
 
     public function register(RegisterRequest $request)
     {
@@ -26,7 +31,7 @@ class AuthController extends Controller
             $validatedData = $request->validated();
             $user = $this->authRepository->register($validatedData);
 
-            return redirect()->route('admin.dashboard')->with('success', 'Utilisateur enregistré avec succès !');
+            return redirect()->route('auth.login')->with('success', 'Utilisateur crée avec succès !');
 
         } catch (\Exception $e) {
 
@@ -34,9 +39,18 @@ class AuthController extends Controller
         }
     }
 
-    // public function login(){
+    public function login(LoginRequest $request)
+    {
+        try {
+            $validatedData = $request->validated();
+            $result = $this->authRepository->login($validatedData);
 
-    // }
+            return redirect()->route('admin.dashboard');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();
+        }
+    }
 
 
 }

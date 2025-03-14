@@ -8,8 +8,18 @@
         <span class="text-3xl font-bold text-indigo-600">GlowUp</span>
         <p class="text-gray-600 mt-2">Connectez-vous </p>
     </div>
+    @if ($errors->any())
+        <div class="alert text-red-600">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-    <form class="space-y-6">
+    <form action="{{ route('loginIn') }}" method="POST" class="space-y-6">
+        @csrf
         <div>
             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
             <div class="mt-1">
