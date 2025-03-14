@@ -7,13 +7,25 @@
     <div class="text-center mb-8">
         <span class="text-3xl font-bold text-indigo-600">GlowUp</span>
         <p class="text-gray-600 mt-2">Créez votre compte chez nous</p>
+
+        <!-- Afficher les erreurs de validation -->
+        @if ($errors->any())
+            <div class="alert text-red-600">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </div>
 
-    <form class="space-y-6">
+    <form action="{{ route('register.addUser') }}" method="POST" class="space-y-6">
+        @csrf
         <div>
-            <label for="fullname" class="block text-sm font-medium text-gray-700">Nom complet</label>
+            <label for="name" class="block text-sm font-medium text-gray-700">Nom complet</label>
             <div class="mt-1">
-                <input type="text" id="fullname" name="fullname" required
+                <input type="text" id="name" name="name" value="{{ old('name') }}" required
                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300"
                        placeholder="Jean Dupont">
             </div>
@@ -22,7 +34,7 @@
         <div>
             <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
             <div class="mt-1">
-                <input type="email" id="email" name="email" required
+                <input type="email" id="email" name="email" value="{{ old('email') }}" required
                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300"
                        placeholder="votre@email.com">
             </div>
@@ -38,11 +50,10 @@
         </div>
 
         <div>
-            <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirmez le mot de passe</label>
+            <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
             <div class="mt-1">
-                <input type="password" id="confirm_password" name="confirm_password" required
-                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300"
-                       placeholder="••••••••">
+                <input type="text" id="phone" name="phone" value="{{ old('phone') }}" required
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300">
             </div>
         </div>
 
