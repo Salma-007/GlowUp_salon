@@ -25,6 +25,16 @@ class User extends Authenticatable
         'phone'
     ];
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function hasPermission($permissionName)
+    {
+        return $this->role->permissions->contains('name', $permissionName);
+    }
+
     /**
      * The attributes that should be hidden for serialization.
      *
