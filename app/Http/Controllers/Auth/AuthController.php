@@ -31,7 +31,7 @@ class AuthController extends Controller
             $validatedData = $request->validated();
             $user = $this->authRepository->register($validatedData);
 
-            return redirect()->route('auth.login')->with('success', 'Utilisateur crée avec succès !');
+            return redirect()->route('loginIn')->with('success', 'Utilisateur crée avec succès !');
 
         } catch (\Exception $e) {
 

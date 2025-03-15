@@ -1,53 +1,64 @@
-<x-guest-layout>
-   <section class="login-content">
-      <div class="row m-0 align-items-center bg-white vh-100">
-         <div class="col-md-6 d-md-block d-none bg-primary p-0 mt-n1 vh-100 overflow-hidden">
-            <img src="{{asset('images/auth/02.png')}}" class="img-fluid gradient-main animated-scaleX" alt="images">
-         </div>
-         <div class="col-md-6 p-0">               
-            <div class="card card-transparent auth-card shadow-none d-flex justify-content-center mb-0">
-               <div class="card-body">
-                  <a href="" class="navbar-brand d-flex align-items-center mb-3">
-                     <svg width="30" class="text-primary" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="-0.757324" y="19.2427" width="28" height="4" rx="2" transform="rotate(-45 -0.757324 19.2427)" fill="currentColor"/>
-                        <rect x="7.72803" y="27.728" width="28" height="4" rx="2" transform="rotate(-45 7.72803 27.728)" fill="currentColor"/>
-                        <rect x="10.5366" y="16.3945" width="16" height="4" rx="2" transform="rotate(45 10.5366 16.3945)" fill="currentColor"/>
-                        <rect x="10.5562" y="-0.556152" width="28" height="4" rx="2" transform="rotate(45 10.5562 -0.556152)" fill="currentColor"/>
-                     </svg>
-                     <h4 class="logo-title ms-3">{{env('APP_NAME')}}</h4>
-                  </a>
-                  <h2 class="mb-2">Reset Password</h2>
-                  <p>Enter your new password and confirm it below to reset your password.</p>
-                  <form>
-                     <div class="row">
-                        <div class="col-lg-12">
-                           <div class="floating-label form-group">
-                              <label for="new_password" class="form-label">New Password</label>
-                              <input type="password" class="form-control" id="new_password" placeholder=" ">
-                           </div>
-                        </div>
-                        <div class="col-lg-12">
-                           <div class="floating-label form-group">
-                              <label for="confirm_password" class="form-label">Confirm Password</label>
-                              <input type="password" class="form-control" id="confirm_password" placeholder=" ">
-                           </div>
-                        </div>
-                     </div>
-                     <button type="submit" class="btn btn-primary btn-block">Reset Password</button>
-                  </form>
-               </div>
-            </div>               
-            <div class="sign-bg sign-bg-right">
-               <svg width="280" height="230" viewBox="0 0 431 398" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g opacity="0.05">
-                  <rect x="-157.085" y="193.773" width="543" height="77.5714" rx="38.7857" transform="rotate(-45 -157.085 193.773)" fill="#3B8AFF"/>
-                  <rect x="7.46875" y="358.327" width="543" height="77.5714" rx="38.7857" transform="rotate(-45 7.46875 358.327)" fill="#3B8AFF"/>
-                  <rect x="61.9355" y="138.545" width="310.286" height="77.5714" rx="38.7857" transform="rotate(45 61.9355 138.545)" fill="#3B8AFF"/>
-                  <rect x="62.3154" y="-190.173" width="543" height="77.5714" rx="38.7857" transform="rotate(45 62.3154 -190.173)" fill="#3B8AFF"/>
-                  </g>
-               </svg>
+@extends('layouts.auth')
+
+@section('title', 'Réinitialiser le mot de passe')
+
+@section('content')
+<div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8 w-full max-w-md">
+    <div class="text-center mb-8">
+        <span class="text-3xl font-bold text-indigo-600">GlowUp</span>
+        <p class="text-gray-600 mt-2">Réinitialiser votre mot de passe</p>
+    </div>
+
+    <form action="{{ route('password.update') }}" method="POST" class="space-y-6">
+        @csrf
+        <input type="hidden" name="token" value="{{ $token }}">
+
+        <div>
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <div class="mt-1">
+                <input type="email" id="email" name="email" required
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300"
+                       placeholder="votre@email.com">
             </div>
-         </div>
-      </div>
-   </section>
-</x-guest-layout>
+        </div>
+
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700">Nouveau mot de passe</label>
+            <div class="mt-1">
+                <input type="password" id="password" name="password" required
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300"
+                       placeholder="••••••••">
+            </div>
+        </div>
+
+        <div>
+            <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
+            <div class="mt-1">
+                <input type="password" id="password_confirmation" name="password_confirmation" required
+                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300"
+                       placeholder="••••••••">
+            </div>
+        </div>
+        @if ($errors->any())
+            <div class="alert text-red-600">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div>
+            <button type="submit"
+                    class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300">
+                Réinitialiser le mot de passe
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-6 text-center">
+        <p class="text-gray-600">Retour à la <a href="{{ route('loginpage') }}" class="text-indigo-600 hover:text-indigo-700 font-semibold">connexion</a></p>
+    </div>
+</div>
+@endsection

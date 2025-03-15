@@ -4,6 +4,18 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\adminController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+
+
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendVerificationCode'])->name('password.email');
+
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword'])->name('password.update');
+
+Route::post('/valide-password', [ResetPasswordController::class, 'validateResetCode'])->name('password.validate');
+Route::get('/reset-password-email', [ResetPasswordController::class, 'showValideToken'])->name('password.resetToken');
 
 Route::post('/register', [AuthController::class, 'register'])->name('register.addUser');
 Route::post('/login', [AuthController::class, 'login'])->name('loginIn');
@@ -11,7 +23,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('loginIn');
 
 
 Route::get('/register', [AuthController::class, 'index']);
-Route::get('/login', [AuthController::class, 'loginpage']);
+Route::get('/login', [AuthController::class, 'loginpage'])->name('loginpage');
 
 Route::get('/', function () {
     return view('welcome');
@@ -56,9 +68,9 @@ Route::get('/admin/reservations', function () {
 Route::get('/admin/dashboard', [adminController::class, 'index'])->name('admin.dashboard');
 
 
-Route::get('/confirm-mail', function () {
-    return view('auth.confirm-mail');
-});
+// Route::get('/confirm-mail', function () {
+//     return view('auth.confirm-mail');
+// });
 
 Route::get('/forgetpassword', function () {
     return view('auth.recoverpw');

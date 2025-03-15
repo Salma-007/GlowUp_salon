@@ -44,6 +44,13 @@
             </button>
         </div>
     </form>
+    <div class="mt-4 text-center">
+        <p class="text-gray-600">
+            <a href="{{ route('password.request') }}" class="text-indigo-600 hover:text-indigo-700 font-semibold">
+                Mot de passe oublié ?
+            </a>
+        </p>
+    </div>
 
     <div class="mt-6 text-center">
         <p class="text-gray-600">Pas encore de compte ? <a href="/register" class="text-indigo-600 hover:text-indigo-700 font-semibold">S'inscrire</a></p>
