@@ -57,4 +57,16 @@ class EmployeeController extends Controller
             return redirect()->back()->with('error', 'Une erreur s\'est produite lors de la création de l\'utilisateur : ' . $e->getMessage())->withInput();
         }
     }
+
+    public function destroy($id)
+    {
+        try{
+            $user = User::findOrFail($id);
+            $user->delete();
+            return back()->with('success', 'User deleted successfully.');
+
+        } catch (\Throwable $th) {
+            throw new \Exception($th->getMessage());
+        }
+    }
 }

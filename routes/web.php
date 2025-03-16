@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\RolePermissionController;
 
 Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin.employees.add');
 Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('ajouter');
+Route::delete('/employees/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
 
 //manage clients

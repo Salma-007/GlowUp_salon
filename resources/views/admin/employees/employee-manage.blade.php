@@ -47,6 +47,21 @@
                     <div>
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Liste des Employés</h3>
                         <p class="mt-1 max-w-2xl text-sm text-gray-500">Gérez vos employés et leurs informations</p>
+                        @if ($errors->any())
+                            <div class="alert text-red-600">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        @if(session('success'))
+                            <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-400 text-green-700">
+                                <p>{{ session('success') }}</p>
+                            </div>
+                        @endif
                     </div>
                     <div class="flex">
                         <div class="relative mr-2">
@@ -115,9 +130,13 @@
                                         <button class="text-indigo-600 hover:text-indigo-900 mr-3">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="text-red-600 hover:text-red-900">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        <form action="{{ route('employee.destroy', $employee->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')" class="inline-block ">
+                                           @csrf
+                                           @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
