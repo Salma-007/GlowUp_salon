@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Role;
 use App\Models\User;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,11 @@ class AuthRepository implements AuthRepositoryInterface
                 'phone' => $data['phone'],
                 'password' => Hash::make($data['password'])
             ]);
+
+            $role = Role::where('name', 'client')->first();
+
+            $user->roles()->sync([$role->id]);
+
 
             $token = $user->createToken("API TOKEN")->plainTextToken;
 

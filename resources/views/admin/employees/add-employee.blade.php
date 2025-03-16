@@ -40,17 +40,25 @@
                 <h2 class="text-xl font-semibold text-blue-800">Informations de l'employé</h2>
                 <p class="text-blue-600 mt-1">Veuillez remplir les informations suivantes</p>
             </div>
+            @if ($errors->any())
+                <div class="alert text-red-600 m-2 ml-4">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
             
             <form action="{{ route('ajouter') }}" method="POST" class="p-6">
                 @csrf
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Colonne gauche -->
                     <div>
                         <!-- Nom -->
                         <div class="mb-6">
-                            <label for="nom" class="block text-gray-800 font-bold mb-2">Nom complet</label>
-                            <input type="text" name="nom" id="nom" required
+                            <label for="name" class="block text-gray-800 font-bold mb-2">Nom complet</label>
+                            <input type="text" name="name" id="name" required
                                 class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         
@@ -71,29 +79,27 @@
                     <div>
                         <!-- Téléphone -->
                         <div class="mb-6">
-                            <label for="telephone" class="block text-gray-800 font-bold mb-2">Numéro de téléphone</label>
+                            <label for="phone" class="block text-gray-800 font-bold mb-2">Numéro de téléphone</label>
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fas fa-phone text-gray-400"></i>
                                 </div>
-                                <input type="tel" name="telephone" id="telephone" required
+                                <input type="tel" name="phone" id="phone" required
                                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
                         
                         <!-- Rôle -->
                         <div class="mb-6">
-                            <label for="role" class="block text-gray-800 font-bold mb-2">Rôle</label>
                             <div class="relative">
-                                <select name="role" id="role" required
-                                    class="appearance-none w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    <option value="">Sélectionner un rôle</option>
-                                    <option value="coiffeur">Coiffeur</option>
-                                    <option value="coloriste">Coloriste</option>
-                                    <option value="estheticien">Esthéticien(ne)</option>
-                                    <option value="reception">Réceptionniste</option>
-                                    <option value="manager">Manager</option>
-                                </select>
+                                    <label for="role" class="block text-gray-800 font-bold mb-2">Rôle</label>
+                                    <select id="role" name="role" class="appearance-none w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                        <option value="">Choisissez un rôle</option>
+                                        @foreach($roles as $role)
+                                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                        @endforeach
+                                    </select>
+                                
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <i class="fas fa-chevron-down text-gray-400"></i>
                                 </div>

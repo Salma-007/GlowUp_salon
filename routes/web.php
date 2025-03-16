@@ -2,11 +2,20 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\adminController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\RolePermissionController;
+
+
+//manage employees
+
+Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin.employees.add');
+Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('ajouter');
+Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
+
 
 // manage roles and permission
 Route::get('/admin/roles-permissions', [RolePermissionController::class, 'index'])->name('admin.roles_permissions.index');
@@ -20,6 +29,7 @@ Route::delete('admin/permissions/{id}', [RolePermissionController::class, 'destr
 Route::get('admin/roles/{role}/edit', [RolePermissionController::class, 'editRole'])->name('admin.roles.edit');
 Route::put('admin/roles/{role}', [RolePermissionController::class, 'update'])->name('admin.roles.update');
 
+// manage authentication
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendVerificationCode'])->name('password.email');
 
@@ -53,9 +63,6 @@ Route::get('/client/dashboard', function () {
     return view('clients.index');
 });
 
-Route::get('/admin/employees', function () {
-    return view('admin.employees.employee-manage');
-});
 
 Route::get('/admin/clients', function () {
     return view('admin.clients.clients-manage');
@@ -70,8 +77,6 @@ Route::get('/admin/add-service', function () {
 });
 
 
-Route::get('/employees/add', [RegisterController::class, 'index'])->name('add-employee.index');
-
 Route::get('/admin/reservations', function () {
     return view('admin.reservations.reservations-manage');
 });
@@ -79,10 +84,6 @@ Route::get('/admin/reservations', function () {
 
 Route::get('/admin/dashboard', [adminController::class, 'index'])->name('admin.dashboard');
 
-
-// Route::get('/confirm-mail', function () {
-//     return view('auth.confirm-mail');
-// });
 
 Route::get('/forgetpassword', function () {
     return view('auth.recoverpw');
