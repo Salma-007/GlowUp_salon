@@ -23,6 +23,8 @@ Route::put('/admin/employees/{employee}', [EmployeeController::class, 'update'])
 //manage clients
 Route::get('/admin/clients', [ClientController::class, 'index'])->name('admin.clients.index');
 Route::delete('/clients/delete/{id}', [ClientController::class, 'destroy'])->name('client.destroy');
+Route::get('/admin/clients/{client}/edit', [ClientController::class, 'edit'])->name('admin.clients.edit');
+Route::put('/admin/clients/{client}', [ClientController::class, 'update'])->name('admin.clients.update');
 
 // manage roles and permission
 Route::get('/admin/roles-permissions', [RolePermissionController::class, 'index'])->name('admin.roles_permissions.index');

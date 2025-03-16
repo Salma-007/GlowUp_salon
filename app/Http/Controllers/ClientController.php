@@ -28,4 +28,30 @@ class ClientController extends Controller
             throw new \Exception($th->getMessage());
         }
     }
+
+    public function edit(User $client)
+    {
+
+        return view('admin.clients.edit', [
+            'client' => $client,
+        ]);
+    }
+
+    public function update(Request $request, User $client)
+    {
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email,' . $client->id,
+                'phone' => 'nullable|string|max:20',
+            ]);
+
+            $client->update($validatedData);
+
+            return redirect()->route('admin.clients.index')->with('success', 'Employé mis à jour avec succès.');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Une erreur s\'est produite lors de la mise à jour de l\'employé.']);
+        }
+    }
 }
