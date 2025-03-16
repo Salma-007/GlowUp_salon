@@ -58,12 +58,44 @@ class EmployeeController extends Controller
         }
     }
 
+    public function edit(User $employee)
+    {
+        $roles = Role::all();
+
+        return view('admin.employees.edit', [
+            'employee' => $employee,
+            'roles' => $roles,
+        ]);
+    }
+
+    public function update(Request $request, User $employee)
+    {
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255|unique:users,email,' . $employee->id,
+                'phone' => 'nullable|string|max:20',
+                'phone' => 'nullable|string|max:20',
+                'role' => 'required|exists:roles,id',
+            ]);
+
+            $employee->update($validatedData);
+
+            $employee->roles()->sync([$request->role]);
+
+            return redirect()->route('admin.employees.index')->with('success', 'Employé mis à jour avec succès.');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Une erreur s\'est produite lors de la mise à jour de l\'employé.']);
+        }
+    }
+
     public function destroy($id)
     {
         try{
             $user = User::findOrFail($id);
             $user->delete();
-            return back()->with('success', 'User deleted successfully.');
+            return back()->with('success', 'Employee deleted successfully.');
 
         } catch (\Throwable $th) {
             throw new \Exception($th->getMessage());

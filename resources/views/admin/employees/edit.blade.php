@@ -37,9 +37,10 @@
     <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">
             <div class="bg-blue-50 p-6 border-b border-blue-100">
-                <h2 class="text-xl font-semibold text-blue-800">Informations de l'employé</h2>
-                <p class="text-blue-600 mt-1">Veuillez remplir les informations suivantes</p>
+                <h2 class="text-xl font-semibold text-blue-800">Éditer les informations de l'employé</h2>
+                <p class="text-blue-600 mt-1">Veuillez modifier les informations suivantes</p>
             </div>
+
             @if ($errors->any())
                 <div class="alert text-red-600 m-2 ml-4">
                     <ul>
@@ -49,16 +50,24 @@
                     </ul>
                 </div>
             @endif
-            
-            <form action="{{ route('ajouter') }}" method="POST" class="p-6">
+
+            @if(session('success'))
+                <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-400 text-green-700">
+                    <p>{{ session('success') }}</p>
+                </div>
+            @endif
+
+            <form action="{{ route('admin.employees.update', $employee->id) }}" method="POST" class="p-6">
                 @csrf
+                @method('PUT')
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Colonne gauche -->
                     <div>
                         <!-- Nom -->
                         <div class="mb-6">
                             <label for="name" class="block text-gray-800 font-bold mb-2">Nom complet</label>
-                            <input type="text" name="name" id="name" required
+                            <input type="text" name="name" id="name" value="{{ old('name', $employee->name) }}" required
                                 class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         
@@ -69,7 +78,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fas fa-envelope text-gray-400"></i>
                                 </div>
-                                <input type="email" name="email" id="email" required
+                                <input type="email" name="email" id="email" value="{{ old('email', $employee->email) }}" required
                                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
@@ -84,22 +93,23 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fas fa-phone text-gray-400"></i>
                                 </div>
-                                <input type="tel" name="phone" id="phone" required
+                                <input type="tel" name="phone" id="phone" value="{{ old('phone', $employee->phone) }}" required
                                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
                         
                         <!-- Rôle -->
                         <div class="mb-6">
+                            <label for="role" class="block text-gray-800 font-bold mb-2">Rôle</label>
                             <div class="relative">
-                                    <label for="role" class="block text-gray-800 font-bold mb-2">Rôle</label>
-                                    <select id="role" name="role" class="appearance-none w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                        <option value="">Choisissez un rôle</option>
-                                        @foreach($roles as $role)
-                                            <option value="{{ $role->id }}">{{ $role->name }}</option>
-                                        @endforeach
-                                    </select>
-                                
+                                <select id="role" name="role" class="appearance-none w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                    <option value="">Choisissez un rôle</option>
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->id }}" {{ $employee->roles->contains($role->id) ? 'selected' : '' }}>
+                                            {{ $role->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <i class="fas fa-chevron-down text-gray-400"></i>
                                 </div>
@@ -113,12 +123,12 @@
                 
                 <!-- Buttons -->
                 <div class="flex justify-end space-x-4">
-                    <a href="/admin/employes" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200 font-medium">
+                    <a href="{{ route('admin.employees.index') }}" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200 font-medium">
                         Annuler
                     </a>
                     <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
-                        <i class="fas fa-user-plus mr-2"></i>
-                        Ajouter l'employé
+                        <i class="fas fa-save mr-2"></i>
+                        Enregistrer 
                     </button>
                 </div>
             </form>

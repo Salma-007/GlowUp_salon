@@ -111,9 +111,13 @@
                                         <button class="text-indigo-600 hover:text-indigo-900 mr-3">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="text-red-600 hover:text-red-900">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                        <form action="{{ route('client.destroy', $client->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')" class="inline-block ">
+                                           @csrf
+                                           @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach

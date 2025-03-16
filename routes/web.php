@@ -17,10 +17,12 @@ Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin
 Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('ajouter');
 Route::delete('/employees/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
+Route::get('/admin/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('admin.employees.edit');
+Route::put('/admin/employees/{employee}', [EmployeeController::class, 'update'])->name('admin.employees.update');
 
 //manage clients
 Route::get('/admin/clients', [ClientController::class, 'index'])->name('admin.clients.index');
-
+Route::delete('/clients/delete/{id}', [ClientController::class, 'destroy'])->name('client.destroy');
 
 // manage roles and permission
 Route::get('/admin/roles-permissions', [RolePermissionController::class, 'index'])->name('admin.roles_permissions.index');

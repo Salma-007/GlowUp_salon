@@ -124,12 +124,10 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button class="text-blue-600 hover:text-blue-900 mr-3">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                       
+                                        <a href="{{ route('admin.employees.edit', $employee->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                             <i class="fas fa-edit"></i>
-                                        </button>
+                                        </a>
                                         <form action="{{ route('employee.destroy', $employee->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')" class="inline-block ">
                                            @csrf
                                            @method('DELETE')
