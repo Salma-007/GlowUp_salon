@@ -56,4 +56,20 @@ class AuthRepository implements AuthRepositoryInterface
         }
     }
 
+    public function logout()
+    {
+        try {
+            Auth::logout();
+
+            if (Auth::check()) {
+                Auth::user()->tokens()->delete(); 
+            }
+
+            return true;
+
+        } catch (\Throwable $th) {
+            throw new \Exception("Erreur lors de la déconnexion : " . $th->getMessage());
+        }
+    }
+
 }

@@ -51,6 +51,20 @@ class AuthController extends Controller
             return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();
         }
     }
+    
+    public function logout(Request $request)
+    {
+        try {
+            $this->authRepository->logout();
 
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('loginIn')->with('success', 'Déconnexion réussie !');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
 
 }

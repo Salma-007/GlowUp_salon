@@ -46,6 +46,7 @@ Route::get('/reset-password-email', [ResetPasswordController::class, 'showValide
 Route::post('/register', [AuthController::class, 'register'])->name('register.addUser');
 Route::post('/login', [AuthController::class, 'login'])->name('loginIn');
 // Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 Route::get('/register', [AuthController::class, 'index']);

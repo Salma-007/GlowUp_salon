@@ -47,10 +47,13 @@
                 <!-- Logout Link -->
                 <div class="pt-8">
                     <div class="space-y-1">
-                        <a href="#" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
+                    <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                        <button type="submit" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
                             <i class="fas fa-sign-out-alt mr-3 text-gray-400 group-hover:text-gray-600"></i>
                             Déconnexion
-                        </a>
+                        </button>
+                    </form>
                     </div>
                 </div>
             </nav>
