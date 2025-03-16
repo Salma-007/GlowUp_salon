@@ -15,7 +15,9 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        $employees = User::with('roles')->paginate(5);  
+        $employees = User::whereDoesntHave('roles', function ($query) {
+            $query->where('name', 'client'); 
+        })->paginate(5); 
         return view('admin.employees.employee-manage', compact('employees'));
     }   
 

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\adminController;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -15,6 +16,9 @@ use App\Http\Controllers\Admin\RolePermissionController;
 Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin.employees.add');
 Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('ajouter');
 Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
+
+//manage clients
+Route::get('/admin/clients', [ClientController::class, 'index'])->name('admin.clients.index');
 
 
 // manage roles and permission
@@ -63,10 +67,6 @@ Route::get('/client/dashboard', function () {
     return view('clients.index');
 });
 
-
-Route::get('/admin/clients', function () {
-    return view('admin.clients.clients-manage');
-});
 
 Route::get('/admin/services', function () {
     return view('admin.services.services-manage');
