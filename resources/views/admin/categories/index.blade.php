@@ -101,19 +101,16 @@
     </div>
 </div>
 
-<!-- Scripts JavaScript -->
 <script>
-    // Ouvrir le modal d'ajout
+
     function openAddCategoryModal() {
         document.getElementById('addCategoryModal').classList.remove('hidden');
     }
 
-    // Fermer le modal d'ajout
     function closeAddCategoryModal() {
         document.getElementById('addCategoryModal').classList.add('hidden');
     }
 
-    // Ouvrir le modal de modification
     function openEditCategoryModal(id, name) {
         document.getElementById('editCategoryId').value = id;
         document.getElementById('editCategoryName').value = name;
@@ -121,12 +118,10 @@
         document.getElementById('editCategoryModal').classList.remove('hidden');
     }
 
-    // Fermer le modal de modification
     function closeEditCategoryModal() {
         document.getElementById('editCategoryModal').classList.add('hidden');
     }
 
-    // Confirmer la suppression
     function confirmDeleteCategory(id) {
         if (confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
 
