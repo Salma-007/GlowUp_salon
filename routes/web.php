@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\adminController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -10,9 +11,13 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\RolePermissionController;
 
+//manage categories
+Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
+Route::put('/admin/categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
+Route::delete('/admin/categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
 //manage employees
-
 Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin.employees.add');
 Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('ajouter');
 Route::delete('/employees/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
