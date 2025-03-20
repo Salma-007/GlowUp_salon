@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\adminController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Auth\AuthController;
@@ -58,6 +59,9 @@ Route::post('/login', [AuthController::class, 'login'])->name('loginIn');
 // Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// services
+Route::get('/admin/services', [ServiceController::class, 'index']);
+
 
 Route::get('/register', [AuthController::class, 'index']);
 Route::get('/login', [AuthController::class, 'loginpage'])->name('loginpage');
@@ -79,9 +83,11 @@ Route::get('/client/dashboard', function () {
 });
 
 
-Route::get('/admin/services', function () {
-    return view('admin.services.services-manage');
-});
+// Route::get('/admin/services', function () {
+//     return view('admin.services.services-manage');
+// });
+
+
 
 Route::get('/admin/add-service', function () {
     return view('admin.services.add-service');
