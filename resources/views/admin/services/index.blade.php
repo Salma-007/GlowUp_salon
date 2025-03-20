@@ -20,7 +20,7 @@
                         <span class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
                     </button>
                 </div>
-                <a href="/admin/add-service" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 flex items-center">
+                <a href="{{ route('services.add-service') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 flex items-center">
                     <i class="fas fa-plus mr-2"></i>
                     Ajouter Service
                 </a>
@@ -98,6 +98,17 @@
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Liste des Services</h3>
                         <p class="mt-1 max-w-2xl text-sm text-gray-500">Gérez vos services et leurs disponibilités</p>
                     </div>
+                    @if(session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
                     <div class="flex">
                         <div class="relative mr-2">
                             <input type="text" class="border border-gray-300 rounded-md py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Rechercher...">
@@ -159,13 +170,13 @@
                                     42 ce mois
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('services.show', $service->id) }}" class="text-blue-600 hover:text-blue-900 mr-3">
+                                    <a href="" class="text-blue-600 hover:text-blue-900 mr-3">
                                         <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{{ route('services.edit', $service->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                    <a href="" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('services.destroy', $service->id) }}" method="POST" class="inline">
+                                    <form action="" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900">
@@ -209,7 +220,7 @@
                                     <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
                                         <span class="sr-only">Suivant</span>
                                         <i class="fas fa-chevron-right h-5 w-5"></i>
-                                    </a>
+                                    </a> 
                                 </nav>
                             </div>
                         </div>

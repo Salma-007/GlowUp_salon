@@ -13,8 +13,9 @@ class ServiceController extends Controller
     public function index()
     {
         try {
-            $services = Service::with('category')->get();
-            return view('services.index', compact('services'));
+            $services = Service::with('category')->paginate(10);
+
+            return view('admin.services.index', compact('services'));
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des services.');
@@ -26,7 +27,7 @@ class ServiceController extends Controller
     {
         try {
             $categories = Category::all();
-            return view('services.create', compact('categories'));
+            return view('admin.services.create', compact('categories'));
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la préparation du formulaire de création.' . $e->getMessage());
@@ -37,7 +38,7 @@ class ServiceController extends Controller
     {
         try {
             Service::create($request->validated());
-            return redirect()->route('services.index')->with('success', 'Service créé avec succès.');
+            return redirect()->route('admin.services.index')->with('success', 'Service créé avec succès.');
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la création du service.' . $e->getMessage());
@@ -85,7 +86,7 @@ class ServiceController extends Controller
         try {
             $service->delete();
             return redirect()->route('services.index')->with('success', 'Service supprimé avec succès.');
-            
+
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la suppression du service.' . $e->getMessage());
         }

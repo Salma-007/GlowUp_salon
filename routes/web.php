@@ -61,6 +61,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // services
 Route::get('/admin/services', [ServiceController::class, 'index']);
+Route::get('/services/ajouter', [ServiceController::class, 'create'])->name('services.add-service');
+Route::post('/services/store', [ServiceController::class, 'store'])->name('services.store');
 
 
 Route::get('/register', [AuthController::class, 'index']);
