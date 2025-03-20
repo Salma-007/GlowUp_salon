@@ -44,24 +44,12 @@ class ServiceController extends Controller
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la création du service.' . $e->getMessage());
         }
     }
-  
-
-  
-    public function show(Service $service)
-    {
-        try {
-            return view('services.show', compact('service'));
-        } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue lors de l\'affichage du service.' . $e->getMessage());
-        }
-    }
-
 
     public function edit(Service $service)
     {
         try {
             $categories = Category::all();
-            return view('services.edit', compact('service', 'categories'));
+            return view('admin.services.edit', compact('service', 'categories'));
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la préparation du formulaire d\'édition.' . $e->getMessage());
@@ -74,7 +62,7 @@ class ServiceController extends Controller
     {
         try {
             $service->update($request->validated());
-            return redirect()->route('services.index')->with('success', 'Service mis à jour avec succès.');
+            return redirect()->route('admin.services.index')->with('success', 'Service mis à jour avec succès.');
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la mise à jour du service.' . $e->getMessage());
@@ -85,7 +73,7 @@ class ServiceController extends Controller
     {
         try {
             $service->delete();
-            return redirect()->route('services.index')->with('success', 'Service supprimé avec succès.');
+            return redirect()->route('admin.services.index')->with('success', 'Service supprimé avec succès.');
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la suppression du service.' . $e->getMessage());

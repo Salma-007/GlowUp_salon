@@ -60,9 +60,11 @@ Route::post('/login', [AuthController::class, 'login'])->name('loginIn');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // services
-Route::get('/admin/services', [ServiceController::class, 'index']);
+Route::get('/admin/services', [ServiceController::class, 'index'])->name('admin.services.index');
 Route::get('/services/ajouter', [ServiceController::class, 'create'])->name('services.add-service');
 Route::post('/services/store', [ServiceController::class, 'store'])->name('services.store');
+Route::get('/services/edit/{service}', [ServiceController::class, 'edit'])->name('services.edit');
+Route::put('/services/update/{service}', [ServiceController::class, 'update'])->name('services.update');
 
 
 Route::get('/register', [AuthController::class, 'index']);
@@ -82,17 +84,6 @@ Route::get('/employee/dashboard', function () {
 
 Route::get('/client/dashboard', function () {
     return view('clients.index');
-});
-
-
-// Route::get('/admin/services', function () {
-//     return view('admin.services.services-manage');
-// });
-
-
-
-Route::get('/admin/add-service', function () {
-    return view('admin.services.add-service');
 });
 
 

@@ -170,10 +170,7 @@
                                     42 ce mois
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="" class="text-blue-600 hover:text-blue-900 mr-3">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                    <a href="{{ route('services.edit', $service->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <form action="" method="POST" class="inline">
