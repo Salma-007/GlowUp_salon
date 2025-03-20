@@ -156,7 +156,7 @@
                                     <div class="text-sm text-gray-900">{{ $service->category->name }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">60 min</div>
+                                    <div class="text-sm text-gray-900">{{ $service->duration }}</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900">{{ $service->price }}€</div>
@@ -173,7 +173,7 @@
                                     <a href="{{ route('services.edit', $service->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="" method="POST" class="inline">
+                                    <form action="{{ route('services.destroy', $service->id) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900">

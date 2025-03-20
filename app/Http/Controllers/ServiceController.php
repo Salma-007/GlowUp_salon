@@ -57,7 +57,6 @@ class ServiceController extends Controller
     }
 
 
-
     public function update(StoreServiceRequest $request, Service $service)
     {
         try {
