@@ -12,6 +12,10 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\RolePermissionController;
 
+
+// Route::middleware('auth')->group(function () { });
+
+
 //manage categories
 Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
 Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
@@ -68,8 +72,8 @@ Route::put('/services/update/{service}', [ServiceController::class, 'update'])->
 Route::delete('/services/destroy/{service}', [ServiceController::class, 'destroy'])->name('services.destroy');
 
 
-Route::get('/register', [AuthController::class, 'index']);
-Route::get('/login', [AuthController::class, 'loginpage'])->name('loginpage');
+Route::get('/register', [AuthController::class, 'index'])->name('register');
+Route::get('/login', [AuthController::class, 'loginpage'])->name('login');
 
 Route::get('/', function () {
     return view('welcome');
