@@ -6,7 +6,7 @@
     <!-- Hero Section -->
     <section class="relative bg-gray-900 text-white">
         <div class="absolute inset-0 overflow-hidden">
-            <img src="/api/placeholder/1920/1080" alt="Salon GlowUp" class="w-full h-full object-cover opacity-40">
+            <img src="{{ asset('storage/pink_background.jpg') }}" alt="Salon GlowUp" class="w-full h-full object-cover opacity-40">
         </div>
         <div class="relative max-w-7xl mx-auto px-4 py-24 sm:px-6 lg:px-8 flex flex-col items-center">
             <h1 class="text-4xl md:text-5xl font-bold text-center mb-6">Révélez votre éclat naturel</h1>
@@ -33,44 +33,20 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            @foreach($services as $service)
                 <!-- Service Card 1 -->
                 <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:shadow-lg hover:transform hover:-translate-y-1">
-                    <img src="/api/placeholder/400/250" alt="Soin du visage" class="w-full h-48 object-cover">
+                    <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}" class="w-full h-48 object-cover">
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Soin du visage luxueux</h3>
-                        <p class="text-gray-600 mb-4">Un traitement complet pour revitaliser et nourrir votre peau en profondeur.</p>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $service->name }}</h3>
+                        <p class="text-gray-600 mb-4">{{ $service->description }}</p>
                         <div class="flex justify-between items-center">
-                            <span class="text-pink-600 font-bold">75€</span>
+                            <span class="text-pink-600 font-bold">{{ $service->price }}$</span>
                             <a href="" class="text-pink-600 hover:text-pink-800 font-medium">Réserver →</a>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Service Card 2 -->
-                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:shadow-lg hover:transform hover:-translate-y-1">
-                    <img src="/api/placeholder/400/250" alt="Manucure" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Manucure & pédicure</h3>
-                        <p class="text-gray-600 mb-4">Soins complets pour des mains et des pieds parfaitement entretenus.</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-pink-600 font-bold">60€</span>
-                            <a href="" class="text-pink-600 hover:text-pink-800 font-medium">Réserver →</a>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Service Card 3 -->
-                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:shadow-lg hover:transform hover:-translate-y-1">
-                    <img src="/api/placeholder/400/250" alt="Massage" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Massage relaxant</h3>
-                        <p class="text-gray-600 mb-4">Un massage apaisant pour détendre les muscles et réduire le stress.</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-pink-600 font-bold">90€</span>
-                            <a href="" class="text-pink-600 hover:text-pink-800 font-medium">Réserver →</a>
-                        </div>
-                    </div>
-                </div>
+            @endforeach
             </div>
             
             <div class="text-center mt-10">

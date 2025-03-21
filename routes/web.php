@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\adminController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ServiceController;
@@ -16,6 +17,8 @@ use App\Http\Controllers\Admin\RolePermissionController;
 
 // Route::middleware('auth')->group(function () { });
 
+//home page
+Route::get('/home', [HomeController::class, 'index']);
 
 // reservations manage
 Route::get('/reservations/add', [ReservationController::class, 'create']);
@@ -91,9 +94,9 @@ Route::get('/employee/dashboard', function () {
     return view('employees.index');
 });
 
-Route::get('/client/dashboard', function () {
-    return view('clients.index');
-});
+// Route::get('/client/dashboard', function () {
+//     return view('clients.index');
+// });
 
 
 Route::get('/admin/reservations', function () {
