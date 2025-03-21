@@ -7,6 +7,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -16,8 +17,8 @@ use App\Http\Controllers\Admin\RolePermissionController;
 // Route::middleware('auth')->group(function () { });
 
 
-// reservations
-
+// reservations manage
+Route::get('/reservations/add', [ReservationController::class, 'create']);
 
 //manage categories
 Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');

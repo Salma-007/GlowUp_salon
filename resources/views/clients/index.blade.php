@@ -23,6 +23,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Nos services populaires</h2>
+                
+                @if (session('error'))
+                        <div class="alert alert-error bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                            {{ session('error') }}
+                        </div>
+                    @endif
                 <p class="text-lg text-gray-600 max-w-3xl mx-auto">Découvrez nos soins les plus appréciés pour une expérience de beauté complète</p>
             </div>
             

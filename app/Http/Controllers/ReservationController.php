@@ -26,10 +26,11 @@ class ReservationController extends Controller
     public function create()
     {
         try {
-            $clients = User::where('role', 'client')->get(); 
-            $employees = User::whereNotIn('role', ['client', 'admin'])->get(); 
+            // $clients = User::where('role_id', 'client')->get(); 
+            $employees = User::whereNotIn('role_id', [2, 4])->get();
             $services = Service::all(); 
-            return view('reservations.create', compact('clients', 'employees', 'services'));
+            return view('clients.reservations.create', compact( 'employees', 'services'));
+
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la préparation du formulaire de création.' . $e->getMessage());
         }

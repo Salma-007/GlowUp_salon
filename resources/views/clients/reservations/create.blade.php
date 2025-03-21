@@ -6,7 +6,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 class="text-3xl font-bold text-gray-900 mb-8">Réserver un service</h1>
         
-        <form action="{{ route('reservations.store') }}" method="POST" class="bg-white p-6 rounded-lg shadow-md">
+        <form action="" method="POST" class="bg-white p-6 rounded-lg shadow-md">
             @csrf
             <div class="mb-4">
                 <label for="service_id" class="block text-gray-700 font-medium mb-2">Service</label>
