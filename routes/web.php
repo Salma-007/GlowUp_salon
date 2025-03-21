@@ -16,6 +16,9 @@ use App\Http\Controllers\Admin\RolePermissionController;
 // Route::middleware('auth')->group(function () { });
 
 
+// reservations
+
+
 //manage categories
 Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
 Route::post('/admin/categories', [CategoryController::class, 'store'])->name('admin.categories.store');
