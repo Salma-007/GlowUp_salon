@@ -24,7 +24,7 @@ Route::get('/services', [HomeController::class, 'services'])->name("services");
 
 
 // reservations manage
-Route::get('/reservations/add', [ReservationController::class, 'create']);
+Route::get('/reservations/add', [ReservationController::class, 'create'])->name("reservation-ajout");
 
 
 //manage categories

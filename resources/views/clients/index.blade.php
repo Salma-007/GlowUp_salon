@@ -12,8 +12,8 @@
             <h1 class="text-4xl md:text-5xl font-bold text-center mb-6">Révélez votre éclat naturel</h1>
             <p class="text-xl text-center max-w-3xl mb-10">Bienvenue chez GlowUp, votre salon esthétique de confiance pour des soins professionnels qui révèlent votre beauté</p>
             <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <a href="" class="bg-pink-600 hover:bg-pink-700 text-white font-medium px-6 py-3 rounded-md text-center">Nos services</a>
-                <a href="" class="bg-white hover:bg-gray-100 text-pink-600 font-medium px-6 py-3 rounded-md text-center">Réserver maintenant</a>
+                <a href="{{ route('services') }}" class="bg-pink-600 hover:bg-pink-700 text-white font-medium px-6 py-3 rounded-md text-center">Nos services</a>
+                <a href="{{ route('reservation-ajout') }}" class="bg-white hover:bg-gray-100 text-pink-600 font-medium px-6 py-3 rounded-md text-center">Réserver maintenant</a>
             </div>
         </div>
     </section>
@@ -50,7 +50,7 @@
             </div>
             
             <div class="text-center mt-10">
-                <a href="" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700">
+                <a href="{{ route('services') }}" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700">
                     Voir tous nos services
                 </a>
             </div>
