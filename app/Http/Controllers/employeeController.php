@@ -75,7 +75,6 @@ class EmployeeController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|email|max:255|unique:users,email,' . $employee->id,
                 'phone' => 'nullable|string|max:20',
-                'phone' => 'nullable|string|max:20',
                 'role' => 'required|exists:roles,id',
             ]);
 
