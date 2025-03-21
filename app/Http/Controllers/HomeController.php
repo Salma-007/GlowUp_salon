@@ -18,4 +18,11 @@ class HomeController extends Controller
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des réservations.' . $e->getMessage());
         }
     }
+
+    public function services()
+    {
+        $services = Service::paginate(6);
+
+        return view('clients.services', compact('services'));
+    }
 }

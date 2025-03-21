@@ -18,10 +18,14 @@ use App\Http\Controllers\Admin\RolePermissionController;
 // Route::middleware('auth')->group(function () { });
 
 //home page
-Route::get('/home', [HomeController::class, 'index']);
+Route::get('/home', [HomeController::class, 'index'])->name("home");
+Route::get('/services', [HomeController::class, 'services'])->name("services");
+
+
 
 // reservations manage
 Route::get('/reservations/add', [ReservationController::class, 'create']);
+
 
 //manage categories
 Route::get('/admin/categories', [CategoryController::class, 'index'])->name('admin.categories.index');
