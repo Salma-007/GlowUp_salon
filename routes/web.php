@@ -90,10 +90,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/admin/dashboard', function () {
-    return view('admin.index');
-});
-
 Route::get('/employee/dashboard', function () {
     return view('employees.index');
 });
@@ -108,7 +104,7 @@ Route::get('/admin/reservations', function () {
 });
 
 
-Route::get('/admin/dashboard', [adminController::class, 'index'])->name('admin.dashboard');
+Route::get('/admin/dashboard', [adminController::class, 'index'])->name('admin.dashboard')->middleware('auth', 'role:admin');
 
 
 Route::get('/forgetpassword', function () {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\RegisterRequest;
 use App\Interfaces\AuthRepositoryInterface;
 
@@ -45,7 +46,15 @@ class AuthController extends Controller
             $validatedData = $request->validated();
             $result = $this->authRepository->login($validatedData);
 
-            return redirect()->route('admin.dashboard');
+            $user = Auth::user();
+
+            if ($user->hasRole('admin')) {
+                return redirect()->route('admin.dashboard');
+            } elseif ($user->hasRole('client')) {
+                return redirect()->route('home');
+            } else {
+                return redirect()->route('admin.dashboard'); 
+            }
 
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => $e->getMessage()])->withInput();

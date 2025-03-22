@@ -28,10 +28,19 @@
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:items-center">
                     @auth
-                        <a href="" class="text-gray-500 hover:text-pink-600 mr-4">
-                            <span class="sr-only">Dashboard</span>
+                        <!-- <a href="{{ route('logout') }}" class="text-gray-500 hover:text-pink-600 mr-4">
                             <i class="fas fa-user-circle text-xl"></i>
-                        </a>
+                            <span class="ml-2 text-sm font-medium">{{ Auth::user()->name }}</span>
+                        </a> -->
+
+                        <form action="{{ route('logout') }}" method="POST" class="inline">
+                            @csrf 
+                            <button type="submit" class="flex items-center text-gray-500 hover:text-pink-600 mr-4 transition duration-200 ease-in-out">
+                                <i class="fas fa-user-circle text-2xl"></i>
+                                <span class="ml-2 text-sm font-medium">{{ Auth::user()->name }}</span>
+                            </button>
+                        </form>
+
                     @else
                         <div class="flex space-x-4">
                             <a href="{{ route('login') }}" class="text-gray-700 hover:text-pink-600 font-medium">Connexion</a>
