@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Service;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
 
@@ -39,15 +40,23 @@ class ReservationController extends Controller
     public function store(StoreReservationRequest $request)
     {
         try {
+
+            if (!Auth::check()) {
+                return redirect()->route('login');
+            }
+    
+            $client = Auth::user();
+
             Reservation::create([
-                'client_id' => $request->client_id,
+                'client_id' => $client->id,
                 'employee_id' => $request->employee_id,
                 'service_id' => $request->service_id,
                 'datetime' => $request->datetime,
                 'status' => $request->status ?? 'pending', 
             ]);
 
-            return redirect()->route('reservations.index')->with('success', 'Réservation créée avec succès.');
+            return redirect()->route('home')->with('success', 'Réservation créée avec succès.');
+            
         } catch (Exception $e) {
 
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la création de la réservation.' . $e->getMessage());

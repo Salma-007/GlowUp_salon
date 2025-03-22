@@ -15,7 +15,10 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\RolePermissionController;
 
 
-// Route::middleware('auth')->group(function () { });
+Route::middleware('auth')->group(function () { 
+    Route::get('/reservations/add', [ReservationController::class, 'create'])->name("reservation-ajout");
+    Route::post('/reservations/ajout', [ReservationController::class, 'store'])->name("new_reservation");
+});
 
 //home page
 Route::get('/home', [HomeController::class, 'index'])->name("home");
@@ -24,7 +27,7 @@ Route::get('/services', [HomeController::class, 'services'])->name("services");
 
 
 // reservations manage
-Route::get('/reservations/add', [ReservationController::class, 'create'])->name("reservation-ajout");
+
 
 
 //manage categories
@@ -104,7 +107,7 @@ Route::get('/admin/reservations', function () {
 });
 
 
-Route::get('/admin/dashboard', [adminController::class, 'index'])->name('admin.dashboard')->middleware('auth', 'role:admin');
+Route::get('/admin/dashboard', [adminController::class, 'index'])->name('admin.dashboard');
 
 
 Route::get('/forgetpassword', function () {

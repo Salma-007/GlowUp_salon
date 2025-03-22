@@ -17,7 +17,6 @@ class StoreReservationRequest extends FormRequest
     public function rules()
     {
         return [
-            'client_id' => 'required|exists:users,id',
             'employee_id' => 'required|exists:users,id',
             'service_id' => 'required|exists:services,id',
             'datetime' => 'required|date',
@@ -27,8 +26,6 @@ class StoreReservationRequest extends FormRequest
     public function messages()
     {
         return [
-            'client_id.required' => 'Le client est obligatoire.',
-            'client_id.exists' => 'Le client sélectionné est invalide.',
             'employee_id.required' => 'L\'employé est obligatoire.',
             'employee_id.exists' => 'L\'employé sélectionné est invalide.',
             'service_id.required' => 'Le service est obligatoire.',
