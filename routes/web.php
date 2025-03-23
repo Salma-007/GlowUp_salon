@@ -18,6 +18,9 @@ use App\Http\Controllers\Admin\RolePermissionController;
 Route::middleware('auth')->group(function () { 
     Route::get('/reservations/add', [ReservationController::class, 'create'])->name("reservation-ajout");
     Route::post('/reservations/ajout', [ReservationController::class, 'store'])->name("new_reservation");
+    Route::get('/mes-reservations', [ReservationController::class, 'clientReservations'])->name('client.reservations');
+    Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+    Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 });
 
 //home page

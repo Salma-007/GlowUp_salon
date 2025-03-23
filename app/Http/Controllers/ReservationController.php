@@ -17,8 +17,9 @@ class ReservationController extends Controller
     public function index()
     {
         try {
+            
             $reservations = Reservation::with(['client', 'employee', 'service'])->paginate(10);
-            return view('reservations.index', compact('reservations'));
+            return view('reservations.index', compact('reservations','employees'));
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des réservations.' . $e->getMessage());
@@ -92,6 +93,7 @@ class ReservationController extends Controller
     public function update(UpdateReservationRequest $request, Reservation $reservation)
     {
         try {
+            
             $reservation->update([
                 'client_id' => $request->client_id,
                 'employee_id' => $request->employee_id,
@@ -110,11 +112,24 @@ class ReservationController extends Controller
     {
         try {
             $reservation->delete();
-            return redirect()->route('reservations.index')->with('success', 'Réservation supprimée avec succès.');
+            return redirect()->route('clients.reservations.index')->with('success', 'Réservation supprimée avec succès.');
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la suppression de la réservation.' . $e->getMessage());
         }
+    }
+
+    public function clientReservations()
+    {
+        $employees = User::whereNotIn('role_id', [2, 4])->get();
+        $client = Auth::user();
+
+        $reservations = Reservation::with(['service', 'employee'])
+            ->where('client_id', $client->id)
+            ->orderBy('datetime', 'desc')
+            ->get();
+
+        return view('clients.reservations.client_reservations', compact('reservations','employees'));
     }
 
 }

@@ -23,7 +23,7 @@
                         <a href="{{ route('home') }}" class="border-transparent text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Accueil</a>
                         <a href="{{ route('services') }}" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Services</a>
                         @auth
-                            <a href="" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Mes Réservation</a>
+                            <a href="{{route('client.reservations')}}" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Mes Réservation</a>
                         @endauth
                         <a href="" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact</a>
                     </nav>
