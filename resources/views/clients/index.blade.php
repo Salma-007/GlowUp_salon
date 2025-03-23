@@ -42,7 +42,7 @@
                         <p class="text-gray-600 mb-4">{{ $service->description }}</p>
                         <div class="flex justify-between items-center">
                             <span class="text-pink-600 font-bold">{{ $service->price }}$</span>
-                            <a href="" class="text-pink-600 hover:text-pink-800 font-medium">Réserver →</a>
+                            <a href="#" onclick="openModal({{ $service->id }})" class="text-pink-600 hover:text-pink-800 font-medium">Réserver →</a>
                         </div>
                     </div>
                 </div>
@@ -184,9 +184,91 @@
             </a>
         </div>
     </section>
+
+<!-- Modal pour la réservation -->
+<div id="reservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <!-- Fond flou -->
+    <div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm" aria-hidden="true"></div>
+
+    <!-- Contenu de la modal -->
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 class="text-lg font-medium leading-6 text-gray-900" id="modalTitle">Réserver un service</h3>
+
+                <!-- Afficher les erreurs de validation -->
+                @if ($errors->any())
+                    <div class="alert alert-error bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form id="reservationForm" action="{{ route('new_reservation') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="service_id" id="service_id">
+
+                    <!-- Sélection de la date -->
+                    <div class="mt-4">
+                        <label for="datetime" class="block text-sm font-medium text-gray-700">Date et heure</label>
+                        <input type="datetime-local" name="datetime" id="datetime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500" required value="{{ old('datetime') }}">
+                    </div>
+
+                    <!-- Sélection de l'employé -->
+                    <div class="mt-4">
+                        <label for="employee_id" class="block text-sm font-medium text-gray-700">Choisir un employé</label>
+                        <select name="employee_id" id="employee_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500" required>
+                            @foreach($employees as $employee)
+                                <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>{{ $employee->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Boutons de la modal -->
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" onclick="closeModal()" class="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                            Annuler
+                        </button>
+                        <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-pink-600 border border-transparent rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
+                            Réserver
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('scripts')
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if ($errors->any())
+            openModal({{ old('service_id') }});
+        @endif
+    });
+
+    function openModal(serviceId) {
+        document.getElementById('service_id').value = serviceId; 
+        document.getElementById('reservationModal').classList.remove('hidden'); 
+    }
+
+    function closeModal() {
+        document.getElementById('reservationModal').classList.add('hidden'); 
+    }
+
+    const modal = document.getElementById('reservationModal');
+    modal.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+</script>
+
 <script>
     // Animation pour les cartes de services
     document.addEventListener('DOMContentLoaded', function() {

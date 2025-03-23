@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Exception;
+use App\Models\User;
 use App\Models\Service;
 use Illuminate\Http\Request;
 
@@ -12,6 +13,11 @@ class HomeController extends Controller
     {
         try {
             $services = Service::with('category')->take(3)->get();
+            $employees = User::whereDoesntHave('roles', function ($query) {
+                $query->where('name', 'client'); 
+            })->get();
+            
+            return view('clients.index', compact('services', 'employees'));
             return view('clients.index', compact('services'));
 
         } catch (Exception $e) {

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
+use App\Http\Requests\StoreModalReservationRequest;
 
 class ReservationController extends Controller
 {
@@ -23,6 +24,7 @@ class ReservationController extends Controller
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des réservations.' . $e->getMessage());
         }
     }
+
 
     public function create()
     {
