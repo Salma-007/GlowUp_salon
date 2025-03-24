@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Service;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Events\ReservationCreated;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
@@ -58,6 +59,8 @@ class ReservationController extends Controller
                 'status' => $request->status ?? 'pending', 
             ]);
 
+            event(new ReservationCreated($reservation));
+            
             return redirect()->route('home')->with('success', 'Réservation créée avec succès.');
             
         } catch (Exception $e) {

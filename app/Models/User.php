@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Role;
+use App\Models\Planning;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,6 +42,11 @@ class User extends Authenticatable
     public function hasRole($role)
     {
         return $this->roles->contains('name', $role);
+    }
+
+    public function plannings()
+    {
+        return $this->hasMany(Planning::class, 'employee_id');
     }
 
     

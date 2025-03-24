@@ -14,8 +14,14 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\RolePermissionController;
 
+use App\Http\Controllers\PlanningController;
+
 
 Route::middleware('auth')->group(function () { 
+    //planning
+    Route::get('/plannings', [PlanningController::class, 'show'])->name('plannings.show');
+
+    // reservations
     Route::get('/reservations/add', [ReservationController::class, 'create'])->name("reservation-ajout");
     Route::post('/reservations/ajout', [ReservationController::class, 'store'])->name("new_reservation");
     Route::get('/mes-reservations', [ReservationController::class, 'clientReservations'])->name('client.reservations');
