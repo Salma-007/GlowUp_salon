@@ -13,6 +13,60 @@ use Illuminate\Support\Facades\Mail;
 
 class EmployeeController extends Controller
 {
+
+    public function search(Request $request)
+    {
+        $output="";
+        $employees = User::where('name','like','%'.$request->search.'%')->orWhere('email','like','%'.$request->search.'%')->get();
+
+        foreach($employees as $employee)
+        {
+            $roles = implode(', ', $employee->roles->pluck('name')->toArray());
+
+            $output.= '<tr class="hover:bg-gray-50 transition duration-300">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">' . $employee->name . '</div>
+                                        <div class="text-sm text-gray-500">Employé depuis ' . $employee->created_at->format('Y') . '</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">' . $employee->email . '</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">' . ($employee->phone ? ($employee->phone) : 'N/A') . '</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">' . $roles . '</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    Actif
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <a href="' . route('admin.employees.edit', $employee->id) . '" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="' . route('admin.employees.destroy', $employee->id) . '" method="POST" onsubmit="return confirm(\'Êtes-vous sûr de vouloir supprimer cet employé ?\')" class="inline-block">
+                                    ' . csrf_field() . method_field('DELETE') . '
+                                    <button type="submit" class="text-red-600 hover:text-red-900">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>';
+        }
+
+        return response($output);
+    }
+
+
     public function index()
     {
         $employees = User::whereDoesntHave('roles', function ($query) {

@@ -50,6 +50,7 @@ Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin
 Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('ajouter');
 Route::delete('/employees/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
 Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
+Route::get('/search', [EmployeeController::class, 'search'])->name('search');
 Route::get('/admin/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('admin.employees.edit');
 Route::put('/admin/employees/{employee}', [EmployeeController::class, 'update'])->name('admin.employees.update');
 
