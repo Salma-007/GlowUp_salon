@@ -53,8 +53,9 @@ class EmployeeController extends Controller
                                 <a href="' . route('admin.employees.edit', $employee->id) . '" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <form action="' . route('admin.employees.destroy', $employee->id) . '" method="POST" onsubmit="return confirm(\'Êtes-vous sûr de vouloir supprimer cet employé ?\')" class="inline-block">
-                                    ' . csrf_field() . method_field('DELETE') . '
+                                <form action="' . route('employee.destroy', $employee->id) . '" method="POST" onsubmit="return confirm(\'Êtes-vous sûr de vouloir supprimer cet employé ?\')" class="inline-block">
+                                    ' . csrf_field() . '
+                                    <input type="hidden" name="_method" value="DELETE">
                                     <button type="submit" class="text-red-600 hover:text-red-900">
                                         <i class="fas fa-trash"></i>
                                     </button>
