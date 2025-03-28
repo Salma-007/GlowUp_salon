@@ -30,18 +30,29 @@
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:items-center">
                     @auth
-                        <!-- <a href="{{ route('logout') }}" class="text-gray-500 hover:text-pink-600 mr-4">
-                            <i class="fas fa-user-circle text-xl"></i>
-                            <span class="ml-2 text-sm font-medium">{{ Auth::user()->name }}</span>
-                        </a> -->
-
-                        <form action="{{ route('logout') }}" method="POST" class="inline">
-                            @csrf 
-                            <button type="submit" class="flex items-center text-gray-500 hover:text-pink-600 mr-4 transition duration-200 ease-in-out">
-                                <i class="fas fa-user-circle text-2xl"></i>
-                                <span class="ml-2 text-sm font-medium">{{ Auth::user()->name }}</span>
-                            </button>
-                        </form>
+                        <!-- Dropdown menu -->
+                        <div class="relative ml-3">
+                            <div>
+                                <button type="button" class="flex items-center max-w-xs text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
+                                    <i class="fas fa-user-circle text-2xl text-gray-500 hover:text-pink-600"></i>
+                                    <span class="ml-2 text-sm font-medium text-gray-700">{{ Auth::user()->name }}</span>
+                                    <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Dropdown items -->
+                            <div class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden transition ease-out duration-200 transform z-50" id="user-menu">
+                                <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Mon Profil
+                                </a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-sign-out-alt mr-2"></i>Déconnexion
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
 
                     @else
                         <div class="flex space-x-4">
@@ -82,7 +93,7 @@
                         </div>
                     </div>
                     <div class="mt-3 space-y-1">
-                        <a href="" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">Mon espace</a>
+                        <a href="{{ route('profile') }}" class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">Mon Profil</a>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="block w-full text-left px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100">Déconnexion</button>
@@ -162,6 +173,33 @@
         // Toggle mobile menu
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Toggle user dropdown
+        document.getElementById('user-menu-button').addEventListener('click', function(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('user-menu');
+            menu.classList.toggle('hidden');
+            menu.classList.toggle('transform');
+            menu.classList.toggle('opacity-0');
+            menu.classList.toggle('opacity-100');
+            menu.classList.toggle('scale-95');
+            menu.classList.toggle('scale-100');
+            
+            // Update aria-expanded
+            const isExpanded = menu.classList.contains('hidden') ? 'false' : 'true';
+            this.setAttribute('aria-expanded', isExpanded);
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('user-menu');
+            const button = document.getElementById('user-menu-button');
+            
+            if (!button.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+                button.setAttribute('aria-expanded', 'false');
+            }
         });
     </script>
     @yield('scripts')
