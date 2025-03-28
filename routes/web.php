@@ -49,13 +49,14 @@ Route::delete('/admin/categories/{category}', [CategoryController::class, 'destr
 Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin.employees.add');
 Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('ajouter');
 Route::delete('/employees/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
-Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
-Route::get('/search', [EmployeeController::class, 'search'])->name('search');
+Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.clients/searchemployees.index');
+Route::get('/employees/search', [EmployeeController::class, 'search']);
 Route::get('/admin/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('admin.employees.edit');
 Route::put('/admin/employees/{employee}', [EmployeeController::class, 'update'])->name('admin.employees.update');
 
 //manage clients
 Route::get('/admin/clients', [ClientController::class, 'index'])->name('admin.clients.index');
+Route::get('/clients/search', [ClientController::class, 'search']);
 Route::delete('/clients/delete/{id}', [ClientController::class, 'destroy'])->name('client.destroy');
 Route::get('/admin/clients/{client}/edit', [ClientController::class, 'edit'])->name('admin.clients.edit');
 Route::put('/admin/clients/{client}', [ClientController::class, 'update'])->name('admin.clients.update');

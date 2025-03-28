@@ -17,7 +17,14 @@ class EmployeeController extends Controller
     public function search(Request $request)
     {
         $output="";
-        $employees = User::where('name','like','%'.$request->search.'%')->orWhere('email','like','%'.$request->search.'%')->get();
+        $employees = User::where(function($query) use ($request) {
+            $query->where('name', 'like', '%'.$request->search.'%')
+                  ->orWhere('email', 'like', '%'.$request->search.'%');
+        })
+        ->whereDoesntHave('roles', function($q) {
+            $q->where('name', 'client'); 
+        })
+        ->get();
 
         foreach($employees as $employee)
         {

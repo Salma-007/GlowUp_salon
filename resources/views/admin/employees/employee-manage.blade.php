@@ -182,7 +182,7 @@
 
         $.ajax({
             type:'get',
-            url:'/search',
+            url:'/employees/search',
             data:{'search':$value},
 
             success:function(data){
