@@ -27,6 +27,7 @@ class StoreServiceRequest extends FormRequest
             'price' => 'required|numeric|min:0',
             'duration' => 'required|integer|min:20|max:90',
             'category_id' => 'required|exists:categories,id',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ];
     }
 
@@ -43,6 +44,9 @@ class StoreServiceRequest extends FormRequest
             'duration.integer' => 'La durée doit être un nombre entier.',
             'duration.min' => 'La durée minimale est de 20 minutes.',
             'duration.max' => 'La durée maximale est de 90 minutes.',
+            'image.image' => 'Le fichier doit être une image.',
+            'image.mimes' => 'L\'image doit être de type : jpeg, png, jpg, gif ou svg.',
+            'image.max' => 'L\'image ne doit pas dépasser 2 Mo.',
         ];
     }
 }

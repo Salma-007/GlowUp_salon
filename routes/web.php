@@ -1,19 +1,42 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\adminController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Admin\RolePermissionController;
 
+use App\Http\Controllers\PlanningController;
 
-// Route::middleware('auth')->group(function () { });
+
+Route::middleware('auth')->group(function () { 
+    //planning
+    Route::get('/plannings', [PlanningController::class, 'show'])->name('plannings.show');
+
+    // reservations
+    Route::get('/reservations/add', [ReservationController::class, 'create'])->name("reservation-ajout");
+    Route::post('/reservations/ajout', [ReservationController::class, 'store'])->name("new_reservation");
+    Route::get('/mes-reservations', [ReservationController::class, 'clientReservations'])->name('client.reservations');
+    Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+    Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+});
+
+//home page
+Route::get('/home', [HomeController::class, 'index'])->name("home");
+Route::get('/services', [HomeController::class, 'services'])->name("services");
+
+
+
+// reservations manage
+
 
 
 //manage categories
@@ -26,12 +49,14 @@ Route::delete('/admin/categories/{category}', [CategoryController::class, 'destr
 Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin.employees.add');
 Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('ajouter');
 Route::delete('/employees/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy');
-Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
+Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.clients/searchemployees.index');
+Route::get('/employees/search', [EmployeeController::class, 'search']);
 Route::get('/admin/employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('admin.employees.edit');
 Route::put('/admin/employees/{employee}', [EmployeeController::class, 'update'])->name('admin.employees.update');
 
 //manage clients
 Route::get('/admin/clients', [ClientController::class, 'index'])->name('admin.clients.index');
+Route::get('/clients/search', [ClientController::class, 'search']);
 Route::delete('/clients/delete/{id}', [ClientController::class, 'destroy'])->name('client.destroy');
 Route::get('/admin/clients/{client}/edit', [ClientController::class, 'edit'])->name('admin.clients.edit');
 Route::put('/admin/clients/{client}', [ClientController::class, 'update'])->name('admin.clients.update');
@@ -79,17 +104,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/admin/dashboard', function () {
-    return view('admin.index');
-});
-
 Route::get('/employee/dashboard', function () {
     return view('employees.index');
 });
 
-Route::get('/client/dashboard', function () {
-    return view('clients.index');
-});
+// Route::get('/client/dashboard', function () {
+//     return view('clients.index');
+// });
 
 
 Route::get('/admin/reservations', function () {

@@ -58,7 +58,7 @@
     </form>
 
     <div class="mt-6 text-center">
-        <p class="text-gray-600">Retour à la <a href="{{ route('loginpage') }}" class="text-indigo-600 hover:text-indigo-700 font-semibold">connexion</a></p>
+        <p class="text-gray-600">Retour à la <a href="{{ route('login') }}" class="text-indigo-600 hover:text-indigo-700 font-semibold">connexion</a></p>
     </div>
 </div>
 @endsection

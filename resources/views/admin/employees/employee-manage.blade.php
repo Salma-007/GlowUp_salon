@@ -65,7 +65,7 @@
                     </div>
                     <div class="flex">
                         <div class="relative mr-2">
-                            <input type="text" class="border border-gray-300 rounded-md py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Rechercher...">
+                            <input type="text" id="search-input" class="border border-gray-300 rounded-md py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Rechercher...">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
@@ -91,7 +91,7 @@
                                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="alldata bg-white divide-y divide-gray-200">
                             @foreach($employees as $employee)
                                 <tr class="hover:bg-gray-50 transition duration-300">
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -139,6 +139,7 @@
                                 </tr>
                             @endforeach
                         </tbody>
+                        <tbody id="Content" class ="searchdata bg-white divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
                 <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
@@ -162,4 +163,34 @@
         </div>
     </main>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+
+    $('#search-input').on('keyup', function()
+    {
+        $value = $(this).val();
+
+        if($value)
+        {
+            $('.alldata').hide();
+            $('.searchdata').show();
+        }
+        else{
+            $('.alldata').show();
+            $('.searchdata').hide(); 
+        }
+
+        $.ajax({
+            type:'get',
+            url:'/employees/search',
+            data:{'search':$value},
+
+            success:function(data){
+                console.log(data);
+                $('#Content').html(data);
+            }
+        })
+    })
+
+</script>
 @endsection
