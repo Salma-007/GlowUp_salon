@@ -34,7 +34,15 @@
                         <div class="relative ml-3">
                             <div>
                                 <button type="button" class="flex items-center max-w-xs text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
-                                    <i class="fas fa-user-circle text-2xl text-gray-500 hover:text-pink-600"></i>
+                                @if(Auth::user()->photo)
+                                    <img class="h-8 w-8 rounded-full object-cover" 
+                                        src="{{ asset('storage/' . Auth::user()->photo) }}" 
+                                        alt="Photo de profil de {{ Auth::user()->name }}">
+                                @else
+                                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <i class="fas fa-user text-gray-500"></i>
+                                    </div>
+                                @endif
                                     <span class="ml-2 text-sm font-medium text-gray-700">{{ Auth::user()->name }}</span>
                                     <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
                                 </button>

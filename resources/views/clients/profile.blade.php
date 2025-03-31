@@ -30,8 +30,8 @@
                     <!-- Photo de profil -->
                     <div class="relative group mb-4 sm:mb-0 sm:mr-8">
                         <div class="w-32 h-32 rounded-full bg-white shadow-md overflow-hidden">
-                            @if(auth()->user()->profile_photo)
-                                <img src="{{ asset('storage/' . auth()->user()->profile_photo) }}" 
+                            @if(auth()->user()->photo)
+                                <img src="{{ asset('storage/' . auth()->user()->photo) }}" 
                                      alt="Photo de profil" 
                                      class="w-full h-full object-cover">
                             @else
