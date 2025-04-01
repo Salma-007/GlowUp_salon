@@ -14,6 +14,7 @@ class Reservation extends Model
         'service_id',
         'datetime',
         'status',
+        'end_time',
     ];
 
     public function client()

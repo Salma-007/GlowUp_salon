@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
 use Exception;
+use DateInterval;
 use App\Models\User;
 use App\Models\Service;
 use App\Models\Reservation;
@@ -51,11 +53,18 @@ class ReservationController extends Controller
     
             $client = Auth::user();
 
+            $service = Service::findOrFail($request->service_id);
+
+            $startTime = new DateTime($request->datetime);
+            $endTime = clone $startTime;
+            $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
+
             Reservation::create([
                 'client_id' => $client->id,
                 'employee_id' => $request->employee_id,
                 'service_id' => $request->service_id,
                 'datetime' => $request->datetime,
+                'end_time' => $endTime->format('Y-m-d H:i:s'),
                 'status' => $request->status ?? 'pending', 
             ]);
 
