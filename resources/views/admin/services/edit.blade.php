@@ -58,14 +58,14 @@
     @endif
 
     <!-- Formulaire de modification -->
-    <form action="{{ route('services.update', $service->id) }}" method="POST">
+    <form action="{{ route('services.update', $service->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
         <!-- Nom du service -->
         <div class="mb-6">
             <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Nom du service</label>
-            <input type="text" id="name" name="name" value="{{  $service->name }}" placeholder="Entrez le nom du service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300">
+            <input type="text" id="name" name="name" value="{{ old('name', $service->name) }}" placeholder="Entrez le nom du service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300">
         </div>
 
         <!-- Description du service -->
@@ -98,6 +98,33 @@
             <input type="number" id="duration" name="duration" value="{{ old('duration', $service->duration) }}" placeholder="Entrez la durée du service" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300">
         </div>
 
+        <!-- Image du service -->
+        <div class="mb-6">
+            <label for="image" class="block text-sm font-medium text-gray-700 mb-2">Photo du service</label>
+            <div id="image-preview-container">
+                <!-- Afficher l'image actuelle avec un ID pour pouvoir la supprimer -->
+                @if($service->image)
+                    <div class="mb-4" id="current-image-container">
+                        <img src="{{ asset('storage/' . $service->image) }}" 
+                            alt="Photo actuelle du service" 
+                            class="h-32 w-32 object-cover rounded-lg border border-gray-200"
+                            id="current-image">
+                        <p class="mt-1 text-sm text-gray-500">Image actuelle</p>
+                    </div>
+                @endif
+
+                <!-- Champ d'upload -->
+                <input type="file" id="image" name="image" accept="image/*" 
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-300">
+            
+            <!-- Conteneur pour la prévisualisation -->
+            <div id="new-image-preview" class="mt-4 hidden">
+                <p class="text-sm text-green-600 mb-2">Nouvelle image sélectionnée :</p>
+                <img id="preview-image" class="h-32 w-32 object-cover rounded-lg border border-gray-200">
+            </div>
+            </div>
+        </div>
+
         <!-- Boutons d'action -->
         <div class="flex justify-end space-x-4">
             <a href="{{ route('admin.services.index') }}" class="px-6 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 transition duration-300">
@@ -109,4 +136,40 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('image');
+        const previewContainer = document.getElementById('new-image-preview');
+        const previewImage = document.getElementById('preview-image');
+        const currentImageWrapper = document.getElementById('current-image-wrapper');
+
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(event) {
+                    // Afficher la prévisualisation
+                    previewImage.src = event.target.result;
+                    previewContainer.classList.remove('hidden');
+                    
+                    // Masquer l'image actuelle si elle existe
+                    if (currentImageWrapper) {
+                        currentImageWrapper.classList.add('hidden');
+                    }
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                // Si aucun fichier sélectionné
+                previewContainer.classList.add('hidden');
+                if (currentImageWrapper) {
+                    currentImageWrapper.classList.remove('hidden');
+                }
+            }
+        });
+    });
+</script>
 @endsection

@@ -6,17 +6,30 @@ use Exception;
 use App\Models\Service;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreServiceRequest;
+use App\Http\Requests\UpdateServiceRequest;
 
 class ServiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $services = Service::with('category')->paginate(10);
+            $query = Service::with('category');
+            
+            if ($request->has('search')) {
+                $query->where('name', 'like', '%'.$request->search.'%');
+            }
 
-            return view('admin.services.index', compact('services'));
-
+            if ($request->has('category')) {
+                $query->where('category_id', $request->category);
+            }
+            
+            $services = $query->paginate(5);
+            $categories = Category::all(); 
+    
+            return view('admin.services.index', compact('services', 'categories'));
+    
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des services.');
         }
@@ -65,10 +78,22 @@ class ServiceController extends Controller
     }
 
 
-    public function update(StoreServiceRequest $request, Service $service)
+    public function update(UpdateServiceRequest $request, Service $service)
     {
         try {
-            $service->update($request->validated());
+            $validatedData = $request->validated();
+
+            if ($request->hasFile('image')) {
+                if ($service->image) {
+                    Storage::disk('public')->delete($service->image);
+                }
+
+                $validatedData['image'] = $request->file('image')->store('services', 'public');
+            }
+    
+            $service->update($validatedData);
+
+
             return redirect()->route('admin.services.index')->with('success', 'Service mis à jour avec succès.');
 
         } catch (Exception $e) {

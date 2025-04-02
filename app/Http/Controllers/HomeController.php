@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\User;
 use App\Models\Service;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -25,10 +26,19 @@ class HomeController extends Controller
         }
     }
 
-    public function services()
+    public function services(Request $request)
     {
-        $services = Service::paginate(6);
+        $query = Service::query();
+        $employees = User::whereNotIn('role_id', [2, 4])->get();
 
-        return view('clients.services', compact('services'));
+        // Filtres
+        if ($request->has('category_id') && $request->category_id) {
+            $query->where('category_id', $request->category_id);
+        }
+        
+        $services = $query->paginate(6);
+        $categories = Category::all();
+        
+        return view('clients.services', compact('services', 'categories','employees'));
     }
 }

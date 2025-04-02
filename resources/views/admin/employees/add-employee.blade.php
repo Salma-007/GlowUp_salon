@@ -113,7 +113,7 @@
                 
                 <!-- Buttons -->
                 <div class="flex justify-end space-x-4">
-                    <a href="/admin/employes" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200 font-medium">
+                    <a href="{{route('admin.employees.index')}}" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200 font-medium">
                         Annuler
                     </a>
                     <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 font-medium">

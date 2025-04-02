@@ -50,7 +50,7 @@
                                     {{ $reservation->service->name }}
                                 </div>
                                 <div class="text-sm text-gray-500">
-                                    {{ $reservation->service->description }}
+                                {{ Str::limit($reservation->service->description, 30, '...') }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
