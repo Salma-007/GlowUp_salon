@@ -109,6 +109,7 @@
                                             <i class="fas fa-eye"></i>
                                         </button>
                                         <a href="{{ route('admin.clients.edit', $client->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                            
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <form action="{{ route('client.destroy', $client->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet employé ?')" class="inline-block ">

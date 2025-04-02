@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
 use Exception;
+use DateInterval;
 use App\Models\User;
 use App\Models\Service;
 use App\Models\Reservation;
@@ -51,11 +53,18 @@ class ReservationController extends Controller
     
             $client = Auth::user();
 
-            Reservation::create([
+            $service = Service::findOrFail($request->service_id);
+
+            $startTime = new DateTime($request->datetime);
+            $endTime = clone $startTime;
+            $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
+
+            $reservation = Reservation::create([
                 'client_id' => $client->id,
                 'employee_id' => $request->employee_id,
                 'service_id' => $request->service_id,
                 'datetime' => $request->datetime,
+                'end_time' => $endTime->format('Y-m-d H:i:s'),
                 'status' => $request->status ?? 'pending', 
             ]);
 
@@ -94,31 +103,40 @@ class ReservationController extends Controller
     }
 
     public function update(UpdateReservationRequest $request, Reservation $reservation)
-    {
-        try {
-            
-            $reservation->update([
-                'client_id' => $request->client_id,
-                'employee_id' => $request->employee_id,
-                'service_id' => $request->service_id,
-                'datetime' => $request->datetime,
-                'status' => $request->status ?? 'pending',
-            ]);
+{
+    try {
+        $startTime = new DateTime($request->datetime);
+        $endTime = clone $startTime;
+        $endTime->add(new DateInterval('PT' . $reservation->service->duration . 'M'));
 
-            return redirect()->route('reservations.index')->with('success', 'Réservation mise à jour avec succès.');
-        } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue lors de la mise à jour de la réservation.' . $e->getMessage());
-        }
+        // On ne met à jour que les champs modifiables
+        $reservation->update([
+            'employee_id' => $request->employee_id,
+            'datetime' => $startTime->format('Y-m-d H:i:s'),
+            'end_time' => $endTime->format('Y-m-d H:i:s'),
+        ]);
+
+        return redirect()->route('client.reservations')->with('success', 'Réservation mise à jour avec succès.');
+    } catch (Exception $e) {
+        return redirect()->route('client.reservations')->with('error', 'Erreur : ' . $e->getMessage());
     }
+}
 
     public function destroy(Reservation $reservation)
     {
         try {
-            $reservation->delete();
-            return redirect()->route('clients.reservations.index')->with('success', 'Réservation supprimée avec succès.');
-
+            $reservation->update([
+                'status' => 'refused'
+            ]);
+    
+            return redirect()
+                   ->route('clients.reservations.client_reservations')
+                   ->with('success', 'Réservation marquée comme refusée avec succès.');
+    
         } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue lors de la suppression de la réservation.' . $e->getMessage());
+            return redirect()
+                   ->back()
+                   ->with('error', 'Échec du refus de la réservation : ' . $e->getMessage());
         }
     }
 

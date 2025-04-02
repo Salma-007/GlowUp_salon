@@ -83,8 +83,10 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            @if($reservation->status !== 'Refused')
                                 <!-- Bouton pour ouvrir le modal de modification -->
-                                <button onclick="openEditModal({{ $reservation->id }}, '{{ $reservation->datetime }}', {{ $reservation->employee_id }})" class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                <button onclick="openEditModal({{ $reservation->id }}, '{{ $reservation->datetime }}', {{ $reservation->employee_id }})" 
+                                        class="text-indigo-600 hover:text-indigo-900 mr-2">
                                     Modifier
                                 </button>
 
@@ -92,11 +94,15 @@
                                 <form action="{{ route('reservations.destroy', $reservation->id) }}" method="POST" class="inline-block">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation ?')">
-                                        Supprimer
+                                    <button type="submit" class="text-red-600 hover:text-red-900" 
+                                            onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
+                                        Annuler
                                     </button>
                                 </form>
-                            </td>
+                            @else
+                                <span class="text-gray-400">Aucune action disponible</span>
+                            @endif
+                        </td>
                         </tr>
                     @empty
                         <tr>
@@ -198,23 +204,37 @@
         const reservationId = formData.get('reservation_id');
 
         fetch(`/reservations/${reservationId}`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'X-HTTP-Method-Override': 'PUT'
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'X-HTTP-Method-Override': 'PUT',
+            'Accept': 'application/json', 
+        }
+    })
+    .then(async response => {
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            const data = await response.json(); 
+            let errorMessage = "Erreur lors de la modification.";
+
+
+            if (data.errors) {
+                errorMessage = Object.values(data.errors).join('\n');
+            } 
+
+            else if (data.message) {
+                errorMessage = data.message;
             }
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.reload(); // Recharger la page après la modification
-            } else {
-                alert('Une erreur s\'est produite lors de la modification.');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
+
+            alert(errorMessage);
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        alert("Erreur réseau ou serveur.");
+    });
     });
 </script>
 @endsection
