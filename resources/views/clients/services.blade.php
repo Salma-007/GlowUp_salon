@@ -58,12 +58,12 @@
 </div>
 
 <!-- Modal de réservation -->
-<div id="reservationModal" class="hidden fixed inset-0 backdrop-blur-sm bg-opacity-50 overflow-y-auto h-full w-full">
+<div id="reservationModal" class="hidden fixed inset-0 bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full">
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3 text-center">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Réserver ce service</h3>
             
-            <form id="reservationForm" method="POST" action="{{ route('new_reservation') }}" class="mt-4">
+            <form method="POST" action="{{ route('new_reservation') }}">
                 @csrf
                 <input type="hidden" name="service_id" id="modal_service_id">
                 
@@ -72,7 +72,8 @@
                     <input type="datetime-local" name="datetime" id="datetime" 
                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
                            min="{{ now()->format('Y-m-d\TH:i') }}"
-                           required>
+                           required
+                           value="{{ old('datetime') }}">
                 </div>
                 
                 <div class="mb-4">
@@ -81,7 +82,9 @@
                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500" required>
                         <option value="">Sélectionnez un employé</option>
                         @foreach($employees as $employee)
-                            <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                            <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
+                                {{ $employee->name }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -100,14 +103,51 @@
         </div>
     </div>
 </div>
-
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                html: `{!! implode('<br>', $errors->all()) !!}`,
+                didDestroy: () => {
+                    document.getElementById('reservationModal').classList.remove('hidden');
+                }
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: '{{ session('error') }}',
+                didDestroy: () => {
+                    document.getElementById('reservationModal').classList.remove('hidden');
+                }
+            });
+        @endif
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Succès',
+                text: '{{ session('success') }}',
+                willClose: () => {
+                    window.location.reload();
+                }
+            });
+        @endif
+    });
+
     function openReservationModal(serviceId) {
+
+        const form = document.querySelector('#reservationModal form');
+        if(form) form.reset();
+        
         document.getElementById('modal_service_id').value = serviceId;
         document.getElementById('reservationModal').classList.remove('hidden');
-        
-        document.querySelector('#reservationModal form').reset();
     }
 
     function closeModal() {
