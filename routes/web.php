@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/mes-reservations', [ReservationController::class, 'clientReservations'])->name('client.reservations');
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
     Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+    Route::get('/admin/reservations', [ReservationController::class, 'index'])->name('admin.reservations');
 });
 
 //home page
@@ -118,9 +119,9 @@ Route::get('/employee/dashboard', function () {
 // });
 
 
-Route::get('/admin/reservations', function () {
-    return view('admin.reservations.reservations-manage');
-});
+// Route::get('/admin/reservations', function () {
+//     return view('admin.reservations.reservations-manage');
+// });
 
 
 Route::get('/admin/dashboard', [adminController::class, 'index'])->name('admin.dashboard');

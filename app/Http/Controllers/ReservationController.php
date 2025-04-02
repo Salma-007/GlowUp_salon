@@ -21,8 +21,10 @@ class ReservationController extends Controller
     {
         try {
             
-            $reservations = Reservation::with(['client', 'employee', 'service'])->paginate(10);
-            return view('reservations.index', compact('reservations','employees'));
+            $reservations = Reservation::with(['client', 'employee', 'service'])
+            ->orderBy('datetime', 'asc')
+            ->get();
+            return view('admin.reservations.reservations-manage', compact('reservations'));
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des réservations.' . $e->getMessage());
