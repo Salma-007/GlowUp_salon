@@ -41,37 +41,132 @@
             <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
                 <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Calendrier des Réservations</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Visualisez et gérez les réservations</p>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">
+                        Visualisez et gérez les réservations (Total: {{ $reservations->count() }})
+                    </p>
                 </div>
                 <div class="p-6">
                     <div id="calendar"></div>
+                </div>
+            </div>
+
+            <!-- Liste détaillée (optionnelle) -->
+            <div class="mt-8 bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
+                <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900">Liste des Réservations</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employé</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Heure</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach($reservations as $reservation)
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <img class="h-10 w-10 rounded-full" src="{{ $reservation->client->profile_photo_url }}" alt="">
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ $reservation->client->name }}</div>
+                                            <div class="text-sm text-gray-500">{{ $reservation->client->email }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ $reservation->service->name }}</div>
+                                    <div class="text-sm text-gray-500">{{ $reservation->service->duration }} min</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">{{ $reservation->employee->name }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">
+                                        {{ \Carbon\Carbon::parse($reservation->datetime)->format('d/m/Y H:i') }}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @switch($reservation->status)
+                                        @case('pending')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">En attente</span>
+                                            @break
+                                        @case('confirmed')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Confirmé</span>
+                                            @break
+                                        @case('cancelled')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Annulé</span>
+                                            @break
+                                        @default
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ $reservation->status }}</span>
+                                    @endswitch
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <a href="#" class="text-blue-600 hover:text-blue-900 mr-3">Modifier</a>
+                                    <a href="#" class="text-red-600 hover:text-red-900">Supprimer</a>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </main>
 </div>
 
-<!-- Include FullCalendar CSS and JS -->
+<!-- FullCalendar CSS/JS -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/fr.js"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
+            locale: 'fr',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
             events: [
+                @foreach($reservations as $reservation)
                 {
-                    title: 'Massage Relaxant',
-                    start: '2023-10-12T10:00:00',
-                    end: '2023-10-12T11:00:00'
+                    title: '{{ $reservation->service->name }} - {{ $reservation->client->name }}',
+                    start: '{{ $reservation->datetime }}',
+                    end: '{{ $reservation->end_time }}',
+                    color: @switch($reservation->status)
+                                @case('Done') '#10B981' @break
+                                @case('Pending') '#F59E0B' @break
+                                @case('Refused') '#EF4444' @break
+                                @default '#6B7280'
+                            @endswitch,
+                    extendedProps: {
+                        client: '{{ $reservation->client->name }}',
+                        employee: '{{ $reservation->employee->name }}',
+                        status: '{{ $reservation->status }}'
+                    }
                 },
-                {
-                    title: 'Coupe Homme',
-                    start: '2023-10-15T14:00:00',
-                    end: '2023-10-15T14:30:00'
-                }
-                // Add more events here
-            ]
+                @endforeach
+            ],
+            eventClick: function(info) {
+                // Afficher les détails de la réservation
+                alert(
+                    'Service: ' + info.event.title + '\n' +
+                    'Client: ' + info.event.extendedProps.client + '\n' +
+                    'Employé: ' + info.event.extendedProps.employee + '\n' +
+                    'Statut: ' + info.event.extendedProps.status
+                );
+            }
         });
         calendar.render();
     });
