@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Exception;
 use App\Models\Role;
+use App\Models\Service;
 use App\Models\Planning;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -50,6 +52,19 @@ class User extends Authenticatable
         return $this->hasMany(Planning::class, 'employee_id');
     }
 
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'employee_service');
+    }
+
+    public function getEmployeesByService($serviceId)
+    {
+        try {
+            return Service::findOrFail($serviceId)->employees;
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Service non trouvé'], 404);
+        }
+    }
     
     /**
      * The attributes that should be hidden for serialization.

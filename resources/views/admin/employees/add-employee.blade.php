@@ -41,12 +41,18 @@
                 <p class="text-blue-600 mt-1">Veuillez remplir les informations suivantes</p>
             </div>
             @if ($errors->any())
-                <div class="alert text-red-600 m-2 ml-4">
+                <div class="alert text-red-600">
                     <ul>
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-400 text-green-700">
+                    <p>{{ session('success') }}</p>
                 </div>
             @endif
             
@@ -106,6 +112,34 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Services -->
+                <div class="mb-6 col-span-2">
+                    <label class="block text-gray-800 font-bold mb-2">
+                        Services associés
+
+                    </label>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        @foreach($services as $service)
+                            <div class="flex items-center">
+                                <input type="checkbox" name="services[]" value="{{ $service->id }}"
+                                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                
+                                <label for="service_{{ $service->id }}" class="ml-2">
+                                    {{ $service->name }}
+                                    @if($service->category)
+                                        <span class="text-xs text-gray-500">({{ $service->category->name }})</span>
+                                    @endif
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    
+                    @error('services.*')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
                 
                 <!-- Ligne de séparation -->

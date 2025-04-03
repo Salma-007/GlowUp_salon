@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Service;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Mail\SendEmployeeMail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\StoreEmployeeRequest;
+use App\Http\Requests\UpdateEmployeeRequest;
 
 class EmployeeController extends Controller
 {
@@ -86,34 +89,39 @@ class EmployeeController extends Controller
     public function create()
     {
         $roles = Role::all();
-        return view('admin.employees.add-employee', ['roles' => $roles]);
+        $services = Service::all(); 
+        return view('admin.employees.add-employee', [
+            'roles' => $roles,
+            'services' => $services
+        ]);
     }
 
-    public function ajouter(Request $request)
+    public function ajouter(StoreEmployeeRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'required',
-            'role' => 'required|exists:roles,id', 
-        ]);
-    
+
+        $validated = $request->validated();
+
         try {
             $randomPassword = Str::random(10);
     
             $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone'],
                 'password' => Hash::make($randomPassword),
             ]);
     
-            $role = Role::find($request->role);
+            $role = Role::find($validated['role']);
             $user->roles()->sync([$role->id]);
+
+            if (!empty($validated['services'])) {
+                $servicesIds = array_map('intval', $validated['services']);
+                $user->services()->sync($servicesIds);
+            }
 
             Mail::to($user->email)->send(new SendEmployeeMail($user->name, $user->email, $randomPassword));
 
-            return redirect()->route('employees.index')->with('success', 'Utilisateur créé avec succès et mot de passe envoyé par e-mail.');
+            return redirect()->route('admin.employees.employee-manage')->with('success', 'Utilisateur créé avec succès et mot de passe envoyé par e-mail.');
     
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur s\'est produite lors de la création de l\'utilisateur : ' . $e->getMessage())->withInput();
@@ -123,26 +131,30 @@ class EmployeeController extends Controller
     public function edit(User $employee)
     {
         $roles = Role::all();
-
+        $services = Service::all(); 
+        $employeeServices = $employee->services->pluck('id')->toArray();
+    
         return view('admin.employees.edit', [
             'employee' => $employee,
             'roles' => $roles,
+            'services' => $services,
+            'employeeServices' => $employeeServices
         ]);
     }
 
-    public function update(Request $request, User $employee)
+    public function update(UpdateEmployeeRequest $request, User $employee)
     {
         try {
-            $validatedData = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255|unique:users,email,' . $employee->id,
-                'phone' => 'nullable|string|max:20',
-                'role' => 'required|exists:roles,id',
+            $validated = $request->validated();
+
+            $employee->update([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'phone' => $validated['phone']
             ]);
 
-            $employee->update($validatedData);
-
-            $employee->roles()->sync([$request->role]);
+            $employee->roles()->sync([$validated['role']]);
+            $employee->services()->sync($validated['services'] ?? []);
 
             return redirect()->route('admin.employees.index')->with('success', 'Employé mis à jour avec succès.');
 
