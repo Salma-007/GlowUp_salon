@@ -84,13 +84,12 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             @if($reservation->status !== 'Refused')
-                                <!-- Bouton pour ouvrir le modal de modification -->
+
                                 <button onclick="openEditModal({{ $reservation->id }}, '{{ $reservation->datetime }}', {{ $reservation->employee_id }})" 
                                         class="text-indigo-600 hover:text-indigo-900 mr-2">
                                     Modifier
                                 </button>
 
-                                <!-- Formulaire pour supprimer la réservation -->
                                 <form action="{{ route('reservations.destroy', $reservation->id) }}" method="POST" class="inline-block">
                                     @csrf
                                     @method('DELETE')
@@ -116,32 +115,27 @@
         </div>
     </div>
 
-    <!-- Modal pour la modification -->
+
     <div id="editReservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
         <!-- Fond flou -->
         <div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm" aria-hidden="true"></div>
 
-        <!-- Contenu de la modal -->
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-lg font-medium leading-6 text-gray-900" id="modalTitle">Modifier la réservation</h3>
 
-                    <!-- Formulaire de modification -->
                     <form id="editReservationForm" method="POST">
                         @csrf
                         @method('PUT')
 
-                        <!-- Champ caché pour l'ID de la réservation -->
                         <input type="hidden" name="reservation_id" id="reservation_id">
 
-                        <!-- Sélection de la date et heure -->
                         <div class="mt-4">
                             <label for="edit_datetime" class="block text-sm font-medium text-gray-700">Date et heure</label>
                             <input type="datetime-local" name="datetime" id="edit_datetime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                         </div>
 
-                        <!-- Sélection de l'employé -->
                         <div class="mt-4">
                             <label for="edit_employee_id" class="block text-sm font-medium text-gray-700">Choisir un employé</label>
                             <select name="employee_id" id="edit_employee_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
@@ -151,7 +145,6 @@
                             </select>
                         </div>
 
-                        <!-- Boutons de la modal -->
                         <div class="mt-6 flex justify-end">
                             <button type="button" onclick="closeEditModal()" class="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 Annuler
@@ -168,24 +161,21 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Fonction pour ouvrir le modal de modification
     function openEditModal(reservationId, datetime, employeeId) {
-        // Pré-remplir le formulaire
+
         document.getElementById('reservation_id').value = reservationId;
         document.getElementById('edit_datetime').value = datetime;
         document.getElementById('edit_employee_id').value = employeeId;
 
-        // Afficher le modal
         document.getElementById('editReservationModal').classList.remove('hidden');
     }
 
-    // Fonction pour fermer le modal de modification
     function closeEditModal() {
         document.getElementById('editReservationModal').classList.add('hidden');
     }
 
-    // Fermer le modal en cliquant à l'extérieur
     document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById('editReservationModal');
         modal.addEventListener('click', function(event) {
@@ -193,9 +183,26 @@
                 closeEditModal();
             }
         });
+
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Succès',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
+
+        @if(session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: '{{ session('error') }}'
+            });
+        @endif
     });
 
-    // Soumettre le formulaire de modification
     document.getElementById('editReservationForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -204,37 +211,58 @@
         const reservationId = formData.get('reservation_id');
 
         fetch(`/reservations/${reservationId}`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'X-HTTP-Method-Override': 'PUT',
-            'Accept': 'application/json', 
-        }
-    })
-    .then(async response => {
-        if (response.ok) {
-            window.location.reload();
-        } else {
-            const data = await response.json(); 
-            let errorMessage = "Erreur lors de la modification.";
-
-
-            if (data.errors) {
-                errorMessage = Object.values(data.errors).join('\n');
-            } 
-
-            else if (data.message) {
-                errorMessage = data.message;
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-HTTP-Method-Override': 'PUT',
+                'Accept': 'application/json',
             }
+        })
+        .then(async response => {
+            if (response.ok) {
+                return response.json().then(data => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Succès',
+                        text: 'Réservation modifiée avec succès',
+                        willClose: () => {
+                            window.location.reload();
+                        }
+                    });
+                });
+            } else {
+                return response.json().then(data => {
+                    let errorMessage = "Erreur lors de la modification.";
 
-            alert(errorMessage);
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-        alert("Erreur réseau ou serveur.");
-    });
+                    if (data.errors) {
+                        errorMessage = Object.values(data.errors).join('\n');
+                    } else if (data.message) {
+                        errorMessage = data.message;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        html: errorMessage.replace(/\n/g, '<br>'),
+                        didDestroy: () => {
+                            document.getElementById('editReservationModal').classList.remove('hidden');
+                        }
+                    });
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Une erreur réseau est survenue',
+                didDestroy: () => {
+                    document.getElementById('editReservationModal').classList.remove('hidden');
+                }
+            });
+        });
     });
 </script>
 @endsection

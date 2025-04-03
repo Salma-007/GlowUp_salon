@@ -15,11 +15,10 @@ class HomeController extends Controller
         try {
             $services = Service::with('category')->take(3)->get();
             $employees = User::whereDoesntHave('roles', function ($query) {
-                $query->where('name', 'client'); 
+                $query->whereIn('name', ['client', 'admin']);
             })->get();
             
             return view('clients.index', compact('services', 'employees'));
-            return view('clients.index', compact('services'));
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des réservations.' . $e->getMessage());

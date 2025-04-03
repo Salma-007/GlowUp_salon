@@ -35,8 +35,9 @@ class ReservationController extends Controller
     public function create()
     {
         try {
-            // $clients = User::where('role_id', 'client')->get(); 
-            $employees = User::whereNotIn('role_id', [2, 4])->get();
+            $employees = User::whereDoesntHave('roles', function ($query) {
+                $query->whereIn('name', ['client', 'admin']);
+            })->get();
             $services = Service::all(); 
             return view('clients.reservations.create', compact( 'employees', 'services'));
 
