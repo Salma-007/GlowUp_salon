@@ -106,13 +106,14 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        null <!-- Afficher "null" pour la dernière réservation -->
+                                        @if($client->reservations->isNotEmpty())
+                                            {{ \Carbon\Carbon::parse($client->reservations->first()->datetime)->format('d/m/Y H:i') }}
+                                        @else
+                                            null
+                                        @endif
                                     </td>
                                     @if(auth()->user()->hasRole('admin'))
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button class="text-blue-600 hover:text-blue-900 mr-3">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
                                         <a href="{{ route('admin.clients.edit', $client->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                             
                                             <i class="fas fa-edit"></i>

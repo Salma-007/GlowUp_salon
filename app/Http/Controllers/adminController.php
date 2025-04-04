@@ -11,6 +11,15 @@ class adminController extends Controller
 {
     public function index()
     {
+
+        if (!auth()->check()) {
+            return redirect()->route('login'); 
+        }
+
+        if (!auth()->user()->hasRole('admin')) {
+            return redirect()->route('employee.reservations'); 
+        }
+
         $totalClients = User::whereHas('roles', function($query) {
             $query->where('name', 'client');
         })->count();

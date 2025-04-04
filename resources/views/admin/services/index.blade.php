@@ -82,38 +82,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 p-3 rounded-lg bg-blue-100 text-blue-600">
-                            <i class="fas fa-calendar-check text-lg"></i>
-                        </div>
-                        <div class="ml-5">
-                            <h3 class="text-lg font-medium text-gray-900">Réservations Mensuelles</h3>
-                            <div class="mt-1 flex items-baseline">
-                                <p class="text-2xl font-semibold text-gray-900">124</p>
-                                <p class="ml-2 text-sm text-gray-600">réservations</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0 p-3 rounded-lg bg-green-100 text-green-600">
-                            <i class="fas fa-euro-sign text-lg"></i>
-                        </div>
-                        <div class="ml-5">
-                            <h3 class="text-lg font-medium text-gray-900">Revenu Mensuel</h3>
-                            <div class="mt-1 flex items-baseline">
-                                <p class="text-2xl font-semibold text-gray-900">4 560€</p>
-                                <p class="ml-2 flex items-center text-sm text-green-600">
-                                    <i class="fas fa-arrow-up mr-1 text-xs"></i>12%
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Services table -->

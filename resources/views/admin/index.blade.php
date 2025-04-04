@@ -28,16 +28,23 @@
                     <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
                         <span class="sr-only">Ouvrir le menu utilisateur</span>
                             <div class="flex items-center">
-                            @if(Auth::user()->photo)
-                                <img class="h-8 w-8 rounded-full object-cover" 
-                                    src="{{ asset('storage/' . Auth::user()->photo) }}" 
-                                    alt="Photo de profil de {{ Auth::user()->name }}">
+                            @auth
+                                @if(Auth::user()->photo)
+                                    <img class="h-8 w-8 rounded-full object-cover" 
+                                        src="{{ asset('storage/' . Auth::user()->photo) }}" 
+                                        alt="Photo de profil de {{ Auth::user()->name }}">
+                                @else
+                                    <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                        <i class="fas fa-user text-gray-500"></i>
+                                    </div>
+                                @endif
+                                <span class="hidden md:block ml-2 text-gray-700">{{ Auth::user()->name }}</span>
                             @else
                                 <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
                                     <i class="fas fa-user text-gray-500"></i>
                                 </div>
-                            @endif
-                                <span class="hidden md:block ml-2 text-gray-700">{{ Auth::user()->name }}</span>
+                                <span class="hidden md:block ml-2 text-gray-700">Invité</span>
+                            @endauth
                             </div>
                     </button>
                 </div>
@@ -151,7 +158,6 @@
                 <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
                     <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="text-lg font-semibold text-gray-900">Activité Récente</h3>
-                        <button class="text-blue-600 hover:text-blue-800 text-sm font-medium">Voir tout</button>
                     </div>
                     <div class="divide-y divide-gray-100">
                         @forelse($activities as $activity)
@@ -296,13 +302,10 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <a href="/admin/client/{{ $client->id }}" class="text-blue-600 hover:text-blue-900 mr-3">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                            <a href="/admin/client/{{ $client->id }}/edit" class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                            <a href="{{ route('admin.clients.edit', $client->id) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="/admin/client/{{ $client->id }}" method="POST" class="inline">
+                                            <form action="{{ route('client.destroy', $client->id) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce client?')">

@@ -9,10 +9,12 @@
         <div class="flex-1 flex flex-col overflow-y-auto">
             <nav class="flex-1 px-4 py-6 space-y-1">
                 <!-- Dashboard Link -->
+                @if(auth()->user()->hasRole('admin'))
                 <a href="/admin/dashboard" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 hover:text-indigo-900 shadow-sm">
                     <i class="fas fa-tachometer-alt mr-3 text-indigo-500 group-hover:text-indigo-700"></i>
                     Tableau de bord
                 </a>
+                @endif
 
                 <!-- Clients Link -->
                 <a href="/admin/clients" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">

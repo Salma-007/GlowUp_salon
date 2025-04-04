@@ -22,6 +22,10 @@ class ClientController extends Controller
     
         foreach($clients as $client)
         {
+            $lastReservation = $client->reservations->isNotEmpty() 
+            ? \Carbon\Carbon::parse($client->reservations->first()->datetime)->format('d/m/Y H:i')
+            : 'null';
+            
             $photoHtml = '<div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
                              <i class="fas fa-user"></i>
                           </div>';
@@ -54,6 +58,8 @@ class ClientController extends Controller
                                     Actif
                                 </span>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">'
+                  . $lastReservation . '</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <a href="' . route('admin.clients.edit', $client->id) . '" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                     <i class="fas fa-edit"></i>
@@ -75,8 +81,12 @@ class ClientController extends Controller
     public function index()
     {
         $clients = User::whereHas('roles', function ($query) {
-            $query->where('name', 'client'); 
-        })->paginate(5);
+            $query->where('name', 'client');
+        })
+        ->with(['reservations' => function($query) {
+            $query->orderByDesc('datetime')->limit(1); 
+        }])
+        ->paginate(5);
     
         return view('admin.clients.clients-manage', compact('clients'));
     }
