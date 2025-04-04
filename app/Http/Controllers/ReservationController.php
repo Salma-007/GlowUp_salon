@@ -23,11 +23,28 @@ class ReservationController extends Controller
             
             $reservations = Reservation::with(['client', 'employee', 'service'])
             ->orderBy('datetime', 'asc')
-            ->get();
+            ->paginate(6);
             return view('admin.reservations.reservations-manage', compact('reservations'));
 
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des réservations.' . $e->getMessage());
+        }
+    }
+
+    public function userReservations()
+    {
+        try {
+            $user = auth()->user();
+            
+            $reservations = Reservation::with(['client', 'employee', 'service'])
+                ->where('client_id', $user->id)
+                ->orWhere('employee_id', $user->id)
+                ->orderBy('datetime', 'asc')
+                ->paginate(10);
+                
+            return view('employees.planning.show', compact('reservations', 'user'));
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', 'Une erreur est survenue: ' . $e->getMessage());
         }
     }
 
@@ -44,6 +61,16 @@ class ReservationController extends Controller
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la préparation du formulaire de création.' . $e->getMessage());
         }
+    }
+
+
+    public function getEmployeesByService($serviceId)
+    {
+        $employees = User::whereHas('services', function($query) use ($serviceId) {
+            $query->where('services.id', $serviceId);
+        })->get();
+
+        return response()->json($employees);
     }
 
     public function store(StoreReservationRequest $request)
@@ -73,7 +100,7 @@ class ReservationController extends Controller
 
             event(new ReservationCreated($reservation));
             
-            return redirect()->route('home')->with('success', 'Réservation créée avec succès.');
+            return redirect()->route('clients.reservations.client_reservations')->with('success', 'Réservation créée avec succès.');
             
         } catch (Exception $e) {
 
@@ -100,30 +127,36 @@ class ReservationController extends Controller
             return view('reservations.edit', compact('reservation', 'clients', 'employees', 'services'));
 
         } catch (Exception $e) {
-
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la préparation du formulaire de modification.' . $e->getMessage());
         }
     }
 
     public function update(UpdateReservationRequest $request, Reservation $reservation)
-{
-    try {
-        $startTime = new DateTime($request->datetime);
-        $endTime = clone $startTime;
-        $endTime->add(new DateInterval('PT' . $reservation->service->duration . 'M'));
-
-        // On ne met à jour que les champs modifiables
-        $reservation->update([
-            'employee_id' => $request->employee_id,
-            'datetime' => $startTime->format('Y-m-d H:i:s'),
-            'end_time' => $endTime->format('Y-m-d H:i:s'),
-        ]);
-
-        return redirect()->route('client.reservations')->with('success', 'Réservation mise à jour avec succès.');
-    } catch (Exception $e) {
-        return redirect()->route('client.reservations')->with('error', 'Erreur : ' . $e->getMessage());
+    {
+        try {
+            $startTime = new DateTime($request->datetime);
+            $endTime = clone $startTime;
+            $endTime->add(new DateInterval('PT' . $reservation->service->duration . 'M'));
+    
+            $reservation->update([
+                'employee_id' => $request->employee_id,
+                'datetime' => $startTime->format('Y-m-d H:i:s'),
+                'end_time' => $endTime->format('Y-m-d H:i:s'),
+            ]);
+    
+            if ($request->wantsJson()) {
+                return response()->json(['success' => 'Réservation mise à jour avec succès.']);
+            }
+    
+            return redirect()->route('client.reservations')->with('success', 'Réservation mise à jour avec succès.');
+        } catch (Exception $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['error' => 'Erreur : ' . $e->getMessage()], 500);
+            }
+    
+            return redirect()->route('client.reservations')->with('error', 'Erreur : ' . $e->getMessage());
+        }
     }
-}
 
     public function destroy(Reservation $reservation)
     {
@@ -145,15 +178,14 @@ class ReservationController extends Controller
 
     public function clientReservations()
     {
-        $employees = User::whereNotIn('role_id', [2, 4])->get();
         $client = Auth::user();
 
-        $reservations = Reservation::with(['service', 'employee'])
-            ->where('client_id', $client->id)
-            ->orderBy('datetime', 'desc')
-            ->get();
+        $reservations = Reservation::with(['service', 'employee', 'service.employees'])
+        ->where('client_id', $client->id)
+        ->orderBy('datetime', 'desc')
+        ->get();
 
-        return view('clients.reservations.client_reservations', compact('reservations','employees'));
+        return view('clients.reservations.client_reservations', compact('reservations'));
     }
 
 }

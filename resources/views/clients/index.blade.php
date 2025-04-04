@@ -42,7 +42,7 @@
                         <p class="text-gray-600 mb-4">{{ $service->description }}</p>
                         <div class="flex justify-between items-center">
                             <span class="text-pink-600 font-bold">{{ $service->price }}$</span>
-                            <a href="#" onclick="openModal({{ $service->id }})" class="text-pink-600 hover:text-pink-800 font-medium">Réserver →</a>
+                            <a href="{{route('services')}}" class="text-pink-600 hover:text-pink-800 font-medium">Réserver →</a>
                         </div>
                     </div>
                 </div>
@@ -270,7 +270,6 @@
 </script>
 
 <script>
-    // Animation pour les cartes de services
     document.addEventListener('DOMContentLoaded', function() {
         const serviceCards = document.querySelectorAll('.grid > div');
         serviceCards.forEach(card => {

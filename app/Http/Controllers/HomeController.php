@@ -27,10 +27,8 @@ class HomeController extends Controller
 
     public function services(Request $request)
     {
-        $query = Service::query();
-        $employees = User::whereNotIn('role_id', [2, 4])->get();
-
-        // Filtres
+        $query = Service::with('employees'); 
+        
         if ($request->has('category_id') && $request->category_id) {
             $query->where('category_id', $request->category_id);
         }
@@ -38,6 +36,6 @@ class HomeController extends Controller
         $services = $query->paginate(6);
         $categories = Category::all();
         
-        return view('clients.services', compact('services', 'categories','employees'));
+        return view('clients.services', compact('services', 'categories'));
     }
 }

@@ -27,7 +27,6 @@ class UpdateReservationRequest extends FormRequest
                     $startTime = $datetime->copy()->setTime(9, 0, 0);
                     $endTime = $datetime->copy()->setTime(16, 0, 0);
 
-                    // Vérification des horaires d'ouverture (9h-16h)
                     if ($datetime->lt($startTime)) {
                         $fail('Les réservations ne sont pas acceptées avant 9:00.');
                     }
@@ -36,14 +35,13 @@ class UpdateReservationRequest extends FormRequest
                         $fail('Les réservations ne sont pas acceptées après 16:00.');
                     }
 
-                    // Vérification que ce n'est pas un week-end
                     if ($datetime->isWeekend()) {
                         $fail('Les réservations ne sont pas acceptées le week-end.');
                     }
                 },
             ],
             'status' => 'nullable|in:pending,confirmed,cancelled,completed',
-            'end_time' => 'nullable|date|after:datetime', // Validation cohérente avec le calcul
+            'end_time' => 'nullable|date|after:datetime', 
         ];
     }
 
@@ -69,7 +67,6 @@ class UpdateReservationRequest extends FormRequest
                 if ($service) {
                     $proposedEnd = Carbon::parse($this->datetime)->addMinutes($service->duration);
                     
-                    // Vérification des conflits de réservation pour l'employé
                     $conflictingReservation = Reservation::where('employee_id', $this->employee_id)
                         ->where(function($query) use ($proposedEnd) {
                             $query->whereBetween('datetime', [$this->datetime, $proposedEnd])

@@ -34,7 +34,6 @@
         </div>
     </header>
 
-    <!-- Main content area -->
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gray-50">
         <div class="max-w-7xl mx-auto">
             <!-- Calendar -->
@@ -42,7 +41,7 @@
                 <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Calendrier des Réservations</h3>
                     <p class="mt-1 max-w-2xl text-sm text-gray-500">
-                        Visualisez et gérez les réservations (Total: {{ $reservations->count() }})
+                        Visualisez et gérez les réservations (Total: {{ $reservations->total() }})
                     </p>
                 </div>
                 <div class="p-6">
@@ -50,10 +49,13 @@
                 </div>
             </div>
 
-            <!-- Liste détaillée -->
+            <!-- Reservations List with Pagination -->
             <div class="mt-8 bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
                 <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Liste des Réservations</h3>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Affichage de {{ $reservations->firstItem() }} à {{ $reservations->lastItem() }} sur {{ $reservations->total() }} réservations
+                    </p>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -68,7 +70,7 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach($reservations as $reservation)
+                            @forelse($reservations as $reservation)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
@@ -129,22 +131,42 @@
                                     </form>
                                 </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Aucune réservation trouvée.</td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 sm:px-6">
+                    <div class="flex items-center justify-between">
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-gray-700">
+                                    Affichage de <span class="font-medium">{{ $reservations->firstItem() }}</span>
+                                    à <span class="font-medium">{{ $reservations->lastItem() }}</span>
+                                    sur <span class="font-medium">{{ $reservations->total() }}</span> résultats
+                                </p>
+                            </div>
+                            <div>
+                                {{ $reservations->links() }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 </div>
 
-<!-- Modal pour les détails de réservation -->
+<!-- Reservation Modal -->
 <div id="reservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <!-- Fond flou -->
-        <div class="fixed inset-0  bg-opacity-50  backdrop-blur-sm aria-hidden="true"></div>
+        <div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm" aria-hidden="true"></div>
 
-        <!-- Contenu du modal -->
         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
@@ -195,13 +217,11 @@
     </div>
 </div>
 
-<!-- FullCalendar CSS/JS -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/fr.js"></script>
 
 <script>
-    // Fonctions pour gérer le modal
     function openReservationModal(service, client, employee, status, date, time, notes, reservationId) {
         document.getElementById('modalService').textContent = service;
         document.getElementById('modalClient').textContent = client;
@@ -237,7 +257,6 @@
         document.getElementById('reservationModal').classList.add('hidden');
     }
 
-    // Initialisation du calendrier
     document.addEventListener('DOMContentLoaded', function() {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
@@ -255,9 +274,9 @@
                     start: '{{ $reservation->datetime }}',
                     end: '{{ $reservation->end_time }}',
                     color: @switch($reservation->status)
-                                @case('Done') '#10B981' @break
-                                @case('Pending') '#F59E0B' @break
-                                @case('Refused') '#EF4444' @break
+                                @case('confirmed') '#10B981' @break
+                                @case('pending') '#F59E0B' @break
+                                @case('cancelled') '#EF4444' @break
                                 @default '#6B7280'
                             @endswitch,
                     extendedProps: {
@@ -288,7 +307,6 @@
         });
         calendar.render();
 
-        // Fermer le modal en cliquant à l'extérieur
         document.getElementById('reservationModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeReservationModal();

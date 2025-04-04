@@ -27,6 +27,18 @@
         </form>
     </div>
 
+    <!-- Affichage des erreurs globales -->
+    <!-- @if($errors->any())
+        <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+            <div class="font-bold">Erreur de validation</div>
+            <ul class="list-disc pl-5">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif -->
+
     <!-- Contenu principal : liste des services -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @foreach($services as $service)
@@ -40,7 +52,7 @@
                         <span class="text-pink-600 font-bold">{{ $service->price }}$</span>
                         <span class="text-gray-500 text-sm ml-2">({{ $service->duration }} minutes)</span>
                     </div>
-                    <button onclick="openReservationModal({{ $service->id }})" 
+                    <button onclick="openReservationModal({{ $service->id }}, '{{ addslashes($service->name) }}', {{ json_encode($service->employees) }})" 
                             class="text-pink-600 hover:text-pink-800 font-medium">
                         Réserver →
                     </button>
@@ -58,107 +70,134 @@
 </div>
 
 <!-- Modal de réservation -->
-<div id="reservationModal" class="hidden fixed inset-0 bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full">
-    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+<div id="reservationModal" class="hidden fixed inset-0 bg-opacity-50 backdrop-blur-sm overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white">
         <div class="mt-3 text-center">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Réserver ce service</h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal_service_name"></h3>
             
-            <form method="POST" action="{{ route('new_reservation') }}">
+            <form method="POST" action="{{ route('new_reservation') }}" class="mt-4">
                 @csrf
-                <input type="hidden" name="service_id" id="modal_service_id">
+                <input type="hidden" name="service_id" id="modal_service_id" value="{{ old('service_id') }}">
                 
-                <div class="mb-4">
-                    <label for="datetime" class="block text-sm font-medium text-gray-700">Date et heure</label>
+                <div class="mb-4 text-left">
+                    <label for="datetime" class="block text-sm font-medium text-gray-700 mb-1">Date et heure</label>
                     <input type="datetime-local" name="datetime" id="datetime" 
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 @error('datetime') border-red-500 @enderror"
                            min="{{ now()->format('Y-m-d\TH:i') }}"
-                           required
-                           value="{{ old('datetime') }}">
+                           value="{{ old('datetime') }}"
+                           required>
+                    @error('datetime')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 
-                <div class="mb-4">
-                    <label for="employee_id" class="block text-sm font-medium text-gray-700">Employé</label>
+                <div class="mb-4 text-left">
+                    <label for="employee_id" class="block text-sm font-medium text-gray-700 mb-1">Employé</label>
                     <select name="employee_id" id="employee_id" 
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500" required>
-                        <option value="">Sélectionnez un employé</option>
-                        @foreach($employees as $employee)
-                            <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
-                                {{ $employee->name }}
-                            </option>
-                        @endforeach
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-pink-500 focus:border-pink-500 @error('employee_id') border-red-500 @enderror" required>
+                        <!-- Options will be filled by JavaScript -->
                     </select>
+                    @error('employee_id')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 
-                <div class="flex justify-end gap-3 mt-4">
+                <div class="flex justify-end gap-3 mt-6">
                     <button type="button" onclick="closeModal()"
-                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">
+                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors">
                         Annuler
                     </button>
                     <button type="submit"
-                            class="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700">
-                        Confirmer
+                            class="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700 transition-colors">
+                        Confirmer la réservation
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+@endsection
+
 @section('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        @if($errors->any())
-            Swal.fire({
-                icon: 'error',
-                title: 'Erreur',
-                html: `{!! implode('<br>', $errors->all()) !!}`,
-                didDestroy: () => {
-                    document.getElementById('reservationModal').classList.remove('hidden');
-                }
-            });
-        @endif
-
-        @if(session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Erreur',
-                text: '{{ session('error') }}',
-                didDestroy: () => {
-                    document.getElementById('reservationModal').classList.remove('hidden');
-                }
-            });
-        @endif
-
-        @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Succès',
-                text: '{{ session('success') }}',
-                willClose: () => {
-                    window.location.reload();
-                }
-            });
-        @endif
-    });
-
-    function openReservationModal(serviceId) {
-
-        const form = document.querySelector('#reservationModal form');
-        if(form) form.reset();
+    // Fonction pour ouvrir le modal avec les données du service
+    function openReservationModal(serviceId, serviceName, employees) {
+        const modal = document.getElementById('reservationModal');
         
+        // Mettre à jour les informations du service
         document.getElementById('modal_service_id').value = serviceId;
-        document.getElementById('reservationModal').classList.remove('hidden');
+        document.getElementById('modal_service_name').textContent = `Réserver: ${serviceName}`;
+        
+        // Remplir la liste des employés
+        const employeeSelect = document.getElementById('employee_id');
+        employeeSelect.innerHTML = '';
+        
+        if (employees && employees.length > 0) {
+            // Ajouter une option vide par défaut
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'Sélectionnez un employé';
+            defaultOption.selected = true;
+            employeeSelect.appendChild(defaultOption);
+            
+            employees.forEach(employee => {
+                const option = document.createElement('option');
+                option.value = employee.id;
+                option.textContent = employee.name;
+                
+                // Sélectionner l'employé précédemment choisi s'il existe
+                if (employee.id == '{{ old('employee_id') }}') {
+                    option.selected = true;
+                }
+                
+                employeeSelect.appendChild(option);
+            });
+        } else {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Aucun employé disponible';
+            option.disabled = true;
+            employeeSelect.appendChild(option);
+        }
+        
+        // Afficher le modal
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
     }
 
+    // Fonction pour fermer le modal
     function closeModal() {
         document.getElementById('reservationModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
     }
 
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('reservationModal')) {
+    // Fermer le modal en cliquant à l'extérieur
+    window.addEventListener('click', function(event) {
+        if (event.target === document.getElementById('reservationModal')) {
             closeModal();
         }
-    }
+    });
+
+    // Gestion des erreurs de validation - Ouverture automatique du modal en cas d'erreur
+    document.addEventListener('DOMContentLoaded', function() {
+        @if($errors->any())
+            const serviceId = {{ old('service_id') ?? 'null' }};
+            if (serviceId) {
+                // Trouver le service correspondant dans la liste affichée
+                const servicesData = {!! $services->getCollection()->toJson() !!};
+                const service = servicesData.find(s => s.id == serviceId);
+                if (service) {
+                    openReservationModal(
+                        serviceId, 
+                        service.name, 
+                        service.employees
+                    );
+                    
+                    // Restaurer les anciennes valeurs du formulaire
+                    document.getElementById('datetime').value = '{{ old('datetime') }}';
+                }
+            }
+        @endif
+    });
 </script>
-@endsection
 @endsection

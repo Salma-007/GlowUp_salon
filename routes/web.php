@@ -28,6 +28,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
     Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
     Route::get('/admin/reservations', [ReservationController::class, 'index'])->name('admin.reservations');
+    Route::get('/employee/planning', [ReservationController::class, 'userReservations'])->name('employee.reservations');
+    Route::get('/services/{service}/employees', [ReservationController::class, 'getEmployeesByService'])
+     ->name('services.employees');
 });
 
 //home page
@@ -114,16 +117,6 @@ Route::get('/', function () {
 Route::get('/employee/dashboard', function () {
     return view('employees.index');
 });
-
-// Route::get('/client/dashboard', function () {
-//     return view('clients.index');
-// });
-
-
-// Route::get('/admin/reservations', function () {
-//     return view('admin.reservations.reservations-manage');
-// });
-
 
 Route::get('/admin/dashboard', [adminController::class, 'index'])->name('admin.dashboard');
 
