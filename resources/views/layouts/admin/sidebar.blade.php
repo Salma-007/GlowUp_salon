@@ -31,13 +31,23 @@
                     <i class="fas fa-cogs mr-3 text-gray-400 group-hover:text-gray-600"></i>
                     Gestion des services
                 </a>
-
+                @if(auth()->user()->hasPermission('see all planning'))
                 <!-- Reservations Link -->
                 <a href="/admin/reservations" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
                     <i class="fas fa-calendar-alt mr-3 text-gray-400 group-hover:text-gray-600"></i>
                     Gestion des réservations
                 </a>
+                @endif
 
+                @if(auth()->user()->hasPermission('see own planning'))
+                <!-- Reservations Link -->
+                <a href="/employee/planning" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
+                    <i class="fas fa-calendar-alt mr-3 text-gray-400 group-hover:text-gray-600"></i>
+                    Mon planning
+                </a>
+                @endif
+
+                @if(auth()->user()->hasRole('admin'))
                 <!-- Roles and Permissions Link -->
                 <a href="{{ route('admin.roles_permissions.index') }}" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
                     <i class="fas fa-user-shield mr-3 text-gray-400 group-hover:text-gray-600"></i>
@@ -48,6 +58,7 @@
                     <i class="fas fa-tags mr-3 text-gray-400 group-hover:text-gray-600"></i>
                     Gestion des catégories
                 </a>
+                @endif
                 <!-- Logout Link -->
                 <div class="pt-8">
                     <div class="space-y-1">

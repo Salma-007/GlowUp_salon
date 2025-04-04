@@ -20,17 +20,26 @@
                         <span class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
                     </button>
                 </div>
+                @if(auth()->user()->hasRole('admin'))
                 <a href="/admin/add-client" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 flex items-center">
                     <i class="fas fa-plus mr-2"></i>
                     Ajouter Client
                 </a>
+                @endif
                 <div class="relative">
                     <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
                         <span class="sr-only">Ouvrir le menu utilisateur</span>
                         <div class="flex items-center">
-                            <img class="h-8 w-8 rounded-full object-cover border-2 border-gray-200" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Photo de profil">
-                            <span class="hidden md:block ml-2 text-gray-700">Admin</span>
-                            <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
+                        @if(Auth::user()->photo)
+                            <img class="h-8 w-8 rounded-full object-cover" 
+                                src="{{ asset('storage/' . Auth::user()->photo) }}" 
+                                alt="Photo de profil de {{ Auth::user()->name }}">
+                        @else
+                            <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-user text-gray-500"></i>
+                            </div>
+                        @endif
+                            <span class="hidden md:block ml-2 text-gray-700">{{ Auth::user()->name }}</span>
                         </div>
                     </button>
                 </div>
@@ -55,13 +64,6 @@
                                 <i class="fas fa-search text-gray-400"></i>
                             </div>
                         </div>
-                        <div>
-                            <select class="border border-gray-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option>Tous les statuts</option>
-                                <option>Actif</option>
-                                <option>Inactif</option>
-                            </select>
-                        </div>
                     </div>
                 </div>
                 <div class="overflow-x-auto">
@@ -73,7 +75,9 @@
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                                 <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dernière Réservation</th>
+                                @if(auth()->user()->hasRole('admin'))
                                 <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody class="alldata bg-white divide-y divide-gray-200">
@@ -110,6 +114,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         null <!-- Afficher "null" pour la dernière réservation -->
                                     </td>
+                                    @if(auth()->user()->hasRole('admin'))
                                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <button class="text-blue-600 hover:text-blue-900 mr-3">
                                             <i class="fas fa-eye"></i>
@@ -126,6 +131,7 @@
                                             </button>
                                         </form>
                                     </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
