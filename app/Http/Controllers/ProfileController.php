@@ -36,7 +36,6 @@ class ProfileController extends Controller
     {
         $path = $request->file('profile_photo')->store('profile-photos', 'public');
         
-        // Supprimer l'ancienne photo si elle existe
         if (auth()->user()->photo) {
             Storage::disk('public')->delete(auth()->user()->photo);
         }

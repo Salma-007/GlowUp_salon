@@ -7,6 +7,7 @@ use Exception;
 use App\Models\Role;
 use App\Models\Service;
 use App\Models\Planning;
+use App\Models\Reservation;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -46,8 +47,10 @@ class User extends Authenticatable
         return false;
     }
     
-    
-
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'client_id');
+    }
 
     public function hasRole($role)
     {

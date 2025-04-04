@@ -20,12 +20,6 @@
                         <span class="absolute top-0 right-0 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">3</span>
                     </button>
                 </div>
-                @if(auth()->user()->hasRole('admin'))
-                <a href="/admin/add-client" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 flex items-center">
-                    <i class="fas fa-plus mr-2"></i>
-                    Ajouter Client
-                </a>
-                @endif
                 <div class="relative">
                     <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
                         <span class="sr-only">Ouvrir le menu utilisateur</span>
