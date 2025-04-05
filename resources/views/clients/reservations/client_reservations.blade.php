@@ -54,7 +54,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                @if($reservation->status !== 'Refused')
+                                @if($reservation->status !== 'Refused' && $reservation->status !== 'Done')
                                     <button onclick="openEditModal({{ $reservation->id }}, '{{ $reservation->datetime }}', {{ $reservation->employee_id }})" 
                                             class="text-indigo-600 hover:text-indigo-900 mr-2">
                                         Modifier

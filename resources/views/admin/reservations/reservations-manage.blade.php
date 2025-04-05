@@ -113,13 +113,13 @@
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @switch($reservation->status)
-                                        @case('pending')
+                                        @case('Pending')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">En attente</span>
                                             @break
-                                        @case('confirmed')
+                                        @case('Done')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Confirmé</span>
                                             @break
-                                        @case('cancelled')
+                                        @case('Refused')
                                             <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Annulé</span>
                                             @break
                                         @default
@@ -139,12 +139,17 @@
                                     )" class="text-blue-600 hover:text-blue-900 mr-3">
                                         Voir
                                     </button>
-                                    <a href="" class="text-indigo-600 hover:text-indigo-900 mr-3">Modifier</a>
-                                    <form action="" method="POST" class="inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation?')">annuler</button>
-                                    </form>
+                                    
+                                    @if($reservation->status !== 'Done' && $reservation->status !== 'Refused')
+                                        <a href="" class="text-indigo-600 hover:text-indigo-900 mr-3">Modifier</a>
+                                        <form action="" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation?')">Annuler</button>
+                                        </form>
+                                    @else
+                                        <span class="text-gray-400">Aucune action disponible</span>
+                                    @endif
                                 </td>
                             </tr>
                             @empty
@@ -225,9 +230,7 @@
                 <button type="button" onclick="closeReservationModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                     Fermer
                 </button>
-                <a id="modalEditLink" href="#" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                    Modifier
-                </a>
+
             </div>
         </div>
     </div>
@@ -238,36 +241,53 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/fr.js"></script>
 
 <script>
-    function openReservationModal(service, client, employee, status, date, time, notes, reservationId) {
-        document.getElementById('modalService').textContent = service;
-        document.getElementById('modalClient').textContent = client;
-        document.getElementById('modalEmployee').textContent = employee;
-        
-        const statusElement = document.getElementById('modalStatus');
-        statusElement.textContent = status;
-        statusElement.className = 'mt-1 text-sm px-2 py-1 rounded-full text-xs font-medium';
-        
-        switch(status.toLowerCase()) {
-            case 'confirmed':
-                statusElement.classList.add('bg-green-100', 'text-green-800');
-                break;
-            case 'pending':
-                statusElement.classList.add('bg-yellow-100', 'text-yellow-800');
-                break;
-            case 'cancelled':
-                statusElement.classList.add('bg-red-100', 'text-red-800');
-                break;
-            default:
-                statusElement.classList.add('bg-gray-100', 'text-gray-800');
-        }
-        
-        document.getElementById('modalDate').textContent = date;
-        document.getElementById('modalTime').textContent = time;
-        document.getElementById('modalNotes').textContent = notes;
-        document.getElementById('modalEditLink').href = '/admin/reservations/' + reservationId + '/edit';
-        
-        document.getElementById('reservationModal').classList.remove('hidden');
+function openReservationModal(service, client, employee, status, date, time, notes, reservationId) {
+    document.getElementById('modalService').textContent = service;
+    document.getElementById('modalClient').textContent = client;
+    document.getElementById('modalEmployee').textContent = employee;
+    
+    const statusElement = document.getElementById('modalStatus');
+    statusElement.textContent = status;
+    statusElement.className = 'mt-1 text-sm px-2 py-1 rounded-full text-xs font-medium';
+    
+    const actionsDiv = document.querySelector('.bg-gray-50.px-4.py-3.sm\\:px-6');
+    
+    const oldEditButton = document.getElementById('modalEditButton');
+    if (oldEditButton) {
+        oldEditButton.remove();
     }
+    
+    if (status !== 'Done' && status !== 'Refused') {
+        const editButton = document.createElement('a');
+        editButton.id = 'modalEditButton';
+        editButton.href = '/admin/reservations/' + reservationId + '/edit';
+        editButton.className = 'w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm';
+        editButton.textContent = 'Modifier';
+
+        const closeButton = document.querySelector('button[onclick="closeReservationModal()"]');
+        closeButton.insertAdjacentElement('beforebegin', editButton);
+    }
+    
+    switch(status) {
+        case 'Done':
+            statusElement.classList.add('bg-green-100', 'text-green-800');
+            break;
+        case 'Pending':
+            statusElement.classList.add('bg-yellow-100', 'text-yellow-800');
+            break;
+        case 'Refused':
+            statusElement.classList.add('bg-red-100', 'text-red-800');
+            break;
+        default:
+            statusElement.classList.add('bg-gray-100', 'text-gray-800');
+    }
+    
+    document.getElementById('modalDate').textContent = date;
+    document.getElementById('modalTime').textContent = time;
+    document.getElementById('modalNotes').textContent = notes;
+    
+    document.getElementById('reservationModal').classList.remove('hidden');
+}
 
     function closeReservationModal() {
         document.getElementById('reservationModal').classList.add('hidden');
@@ -290,9 +310,9 @@
                     start: '{{ $reservation->datetime }}',
                     end: '{{ $reservation->end_time }}',
                     color: @switch($reservation->status)
-                                @case('confirmed') '#10B981' @break
-                                @case('pending') '#F59E0B' @break
-                                @case('cancelled') '#EF4444' @break
+                                @case('Done') '#10B981' @break
+                                @case('Pending') '#F59E0B' @break
+                                @case('Refused') '#EF4444' @break
                                 @default '#6B7280'
                             @endswitch,
                     extendedProps: {
