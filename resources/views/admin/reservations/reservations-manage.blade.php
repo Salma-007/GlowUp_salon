@@ -85,7 +85,13 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0 h-10 w-10">
-                                            <img class="h-10 w-10 rounded-full" src="{{ $reservation->client->profile_photo_url }}" alt="">
+                                            @if($reservation->client->photo)
+                                            <img class="h-10 w-10 rounded-full" src="{{ asset('storage/' .$reservation->client->photo) }}" alt="Photo de profil de {{ $reservation->client->name }}">
+                                            @else
+                                            <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                                <i class="fas fa-user text-gray-500"></i>
+                                            </div>
+                                            @endif
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900">{{ $reservation->client->name }}</div>
@@ -137,7 +143,7 @@
                                     <form action="" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette réservation?')">Supprimer</button>
+                                        <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation?')">annuler</button>
                                     </form>
                                 </td>
                             </tr>

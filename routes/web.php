@@ -78,6 +78,7 @@ Route::middleware('auth')->group(function () {
 
 //home page
 Route::get('/home', [HomeController::class, 'index'])->name("home");
+Route::get('/', [HomeController::class, 'index']);
 Route::get('/services', [HomeController::class, 'services'])->name("services");
 
 
@@ -116,9 +117,9 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'index'])->name('register');
 Route::get('/login', [AuthController::class, 'loginpage'])->name('login');
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('home');
+// });
 
 Route::get('/employee/dashboard', function () {
     return view('employees.index');

@@ -1,6 +1,6 @@
 @extends('layouts.client.app')
 
-@section('title', 'Tous les Services')
+@section('title', 'Réserver un service')
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -26,18 +26,6 @@
             @endif
         </form>
     </div>
-
-    <!-- Affichage des erreurs globales -->
-    <!-- @if($errors->any())
-        <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
-            <div class="font-bold">Erreur de validation</div>
-            <ul class="list-disc pl-5">
-                @foreach($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif -->
 
     <!-- Contenu principal : liste des services -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -75,6 +63,11 @@
         <div class="mt-3 text-center">
             <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal_service_name"></h3>
             
+            <!-- Conteneur d'erreur -->
+            <div id="modalError" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
+                <p id="modalErrorMessage"></p>
+            </div>
+
             <form method="POST" action="{{ route('new_reservation') }}" class="mt-4">
                 @csrf
                 <input type="hidden" name="service_id" id="modal_service_id" value="{{ old('service_id') }}">
@@ -163,12 +156,33 @@
         // Afficher le modal
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+
+        // Afficher les erreurs s'il y en a
+        @if(session('error'))
+            showModalError('{{ session('error') }}');
+        @endif
+    }
+
+    // Fonction pour afficher les erreurs dans le modal
+    function showModalError(message) {
+        const errorDiv = document.getElementById('modalError');
+        const errorMessage = document.getElementById('modalErrorMessage');
+        
+        errorDiv.classList.remove('hidden');
+        errorMessage.textContent = message;
+        
+        // Masquer automatiquement après 5 secondes
+        setTimeout(() => {
+            errorDiv.classList.add('hidden');
+        }, 8000);
     }
 
     // Fonction pour fermer le modal
     function closeModal() {
         document.getElementById('reservationModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
+        // Cacher aussi les erreurs quand on ferme le modal
+        document.getElementById('modalError').classList.add('hidden');
     }
 
     // Fermer le modal en cliquant à l'extérieur
@@ -180,8 +194,8 @@
 
     // Gestion des erreurs de validation - Ouverture automatique du modal en cas d'erreur
     document.addEventListener('DOMContentLoaded', function() {
-        @if($errors->any())
-            const serviceId = {{ old('service_id') ?? 'null' }};
+        @if($errors->any() || session('error'))
+            const serviceId = {{ old('service_id', session('service_id')) ?? 'null' }};
             if (serviceId) {
                 // Trouver le service correspondant dans la liste affichée
                 const servicesData = {!! $services->getCollection()->toJson() !!};

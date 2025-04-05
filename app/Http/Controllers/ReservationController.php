@@ -20,9 +20,12 @@ class ReservationController extends Controller
     public function index()
     {
         try {
-            
+            Reservation::where('end_time', '<', now())
+            ->whereNotIn('status', ['Done', 'Refused'])
+            ->update(['status' => 'Done']);
+
             $reservations = Reservation::with(['client', 'employee', 'service'])
-            ->orderBy('datetime', 'asc')
+            ->orderBy('datetime', 'desc')
             ->paginate(6);
             return view('admin.reservations.reservations-manage', compact('reservations'));
 
@@ -76,7 +79,6 @@ class ReservationController extends Controller
     public function store(StoreReservationRequest $request)
     {
         try {
-
             if (!Auth::check()) {
                 return redirect()->route('login');
             }
@@ -88,6 +90,28 @@ class ReservationController extends Controller
             $startTime = new DateTime($request->datetime);
             $endTime = clone $startTime;
             $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
+
+            // Vérification de la disponibilité de l'employé
+                $isEmployeeAvailable = !Reservation::where('employee_id', $request->employee_id)
+                ->where(function($query) use ($startTime, $endTime) {
+                    $query->whereBetween('datetime', [$startTime, $endTime])
+                        ->orWhereBetween('end_time', [$startTime, $endTime])
+                        ->orWhere(function($q) use ($startTime, $endTime) {
+                            $q->where('datetime', '<', $startTime)
+                                ->where('end_time', '>', $endTime);
+                        });
+                })
+                ->whereNotIn('status', ['cancelled', 'refused'])
+                ->exists();
+
+                if (!$isEmployeeAvailable) {
+                    return back()
+                        ->withInput()
+                        ->with([
+                            'error' => 'Empolyé est indisponible à cette heure. Veuillez choisir un autre créneau.',
+                            'service_id' => $request->service_id
+                        ]);
+                }
 
             $reservation = Reservation::create([
                 'client_id' => $client->id,
