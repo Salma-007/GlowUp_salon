@@ -98,7 +98,7 @@
                                 <input 
                                     type="text" 
                                     name="search" 
-                                    value="{{ request('search') }}" 
+                                    id="search-input"
                                     class="border border-gray-300 rounded-md py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
                                     placeholder="Rechercher..."
                                 >
@@ -153,7 +153,7 @@
                                 @endif
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="alldata bg-white divide-y divide-gray-200">
                             @forelse($services as $service)
                             <tr class="hover:bg-gray-50 transition duration-300">
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -208,6 +208,7 @@
                             </tr>
                             @endforelse
                         </tbody>
+                        <tbody id="Content" class ="searchdata bg-white divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
                 <!-- Pagination -->
@@ -219,7 +220,6 @@
     </main>
 </div>
 
-@section('scripts')
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
@@ -240,7 +240,7 @@
 
         $.ajax({
             type:'get',
-            url:'/clients/search',
+            url:'/services/search',
             data:{'search':$value},
 
             success:function(data){
@@ -251,5 +251,4 @@
     })
 
 </script>
-@endsection
 @endsection

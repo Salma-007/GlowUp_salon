@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/services/edit/{service}', [ServiceController::class, 'edit'])->name('services.edit')->middleware('role:admin');
     Route::put('/services/update/{service}', [ServiceController::class, 'update'])->name('services.update')->middleware('role:admin');
     Route::delete('/services/destroy/{service}', [ServiceController::class, 'destroy'])->name('services.destroy')->middleware('role:admin');
+    Route::get('/services/search', [ServiceController::class, 'search']);
 
     // manage roles and permission
     Route::get('/admin/roles-permissions', [RolePermissionController::class, 'index'])->name('admin.roles_permissions.index')->middleware('role:admin');
