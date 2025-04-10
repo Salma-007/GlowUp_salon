@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <!-- Barre de filtre en haut -->
+
     <div class="mb-6 flex items-center justify-between bg-white p-3 rounded-lg shadow-md">
         <h1 class="text-2xl font-bold text-gray-900">Tous nos Services</h1>
         <form method="GET" action="{{ route('services') }}" class="flex items-center gap-3">
@@ -27,7 +27,6 @@
         </form>
     </div>
 
-    <!-- Contenu principal : liste des services -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         @foreach($services as $service)
         <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:shadow-lg hover:transform hover:-translate-y-1">
@@ -113,20 +112,19 @@
 
 @section('scripts')
 <script>
-    // Fonction pour ouvrir le modal avec les données du service
+
     function openReservationModal(serviceId, serviceName, employees) {
         const modal = document.getElementById('reservationModal');
         
-        // Mettre à jour les informations du service
         document.getElementById('modal_service_id').value = serviceId;
         document.getElementById('modal_service_name').textContent = `Réserver: ${serviceName}`;
         
-        // Remplir la liste des employés
+
         const employeeSelect = document.getElementById('employee_id');
         employeeSelect.innerHTML = '';
         
         if (employees && employees.length > 0) {
-            // Ajouter une option vide par défaut
+
             const defaultOption = document.createElement('option');
             defaultOption.value = '';
             defaultOption.textContent = 'Sélectionnez un employé';
@@ -138,7 +136,6 @@
                 option.value = employee.id;
                 option.textContent = employee.name;
                 
-                // Sélectionner l'employé précédemment choisi s'il existe
                 if (employee.id == '{{ old('employee_id') }}') {
                     option.selected = true;
                 }
@@ -153,17 +150,16 @@
             employeeSelect.appendChild(option);
         }
         
-        // Afficher le modal
+
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
 
-        // Afficher les erreurs s'il y en a
         @if(session('error'))
             showModalError('{{ session('error') }}');
         @endif
     }
 
-    // Fonction pour afficher les erreurs dans le modal
+
     function showModalError(message) {
         const errorDiv = document.getElementById('modalError');
         const errorMessage = document.getElementById('modalErrorMessage');
@@ -171,33 +167,29 @@
         errorDiv.classList.remove('hidden');
         errorMessage.textContent = message;
         
-        // Masquer automatiquement après 5 secondes
+
         setTimeout(() => {
             errorDiv.classList.add('hidden');
         }, 8000);
     }
 
-    // Fonction pour fermer le modal
     function closeModal() {
         document.getElementById('reservationModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
-        // Cacher aussi les erreurs quand on ferme le modal
+
         document.getElementById('modalError').classList.add('hidden');
     }
 
-    // Fermer le modal en cliquant à l'extérieur
     window.addEventListener('click', function(event) {
         if (event.target === document.getElementById('reservationModal')) {
             closeModal();
         }
     });
 
-    // Gestion des erreurs de validation - Ouverture automatique du modal en cas d'erreur
     document.addEventListener('DOMContentLoaded', function() {
         @if($errors->any() || session('error'))
             const serviceId = {{ old('service_id', session('service_id')) ?? 'null' }};
             if (serviceId) {
-                // Trouver le service correspondant dans la liste affichée
                 const servicesData = {!! $services->getCollection()->toJson() !!};
                 const service = servicesData.find(s => s.id == serviceId);
                 if (service) {
@@ -207,7 +199,6 @@
                         service.employees
                     );
                     
-                    // Restaurer les anciennes valeurs du formulaire
                     document.getElementById('datetime').value = '{{ old('datetime') }}';
                 }
             }

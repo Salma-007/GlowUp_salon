@@ -89,6 +89,9 @@
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <h3 class="text-lg font-medium leading-6 text-gray-900">Modifier la réservation</h3>
+                    <div id="editModalError" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
+                        <p id="editModalErrorMessage"></p>
+                    </div>
                     <form id="editReservationForm" method="POST">
                         @csrf
                         @method('PUT')
@@ -121,59 +124,58 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function openEditModal(reservationId, datetime, employeeId) {
 
-        const reservation = {!! $reservations->toJson() !!}.find(r => r.id === reservationId);
-        
-        document.getElementById('reservation_id').value = reservationId;
-        document.getElementById('edit_datetime').value = datetime;
+function openEditModal(reservationId, datetime, employeeId) {
+    const reservation = {!! $reservations->toJson() !!}.find(r => r.id === reservationId);
+    
+    document.getElementById('reservation_id').value = reservationId;
 
-        const select = document.getElementById('edit_employee_id');
-        select.innerHTML = '';
-        
-        reservation.service.employees.forEach(employee => {
-            const option = document.createElement('option');
-            option.value = employee.id;
-            option.textContent = employee.name;
-            option.selected = (employee.id == employeeId);
-            select.appendChild(option);
-        });
+    document.getElementById('edit_datetime').value = datetime.replace(' ', 'T');
 
-        document.getElementById('editReservationModal').classList.remove('hidden');
-    }
-
-    function closeEditModal() {
-        document.getElementById('editReservationModal').classList.add('hidden');
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('editReservationModal');
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                closeEditModal();
-            }
-        });
-
-        @if(session('success'))
-            Swal.fire({
-                icon: 'success',
-                title: 'Succès',
-                text: '{{ session('success') }}',
-                timer: 3000,
-                showConfirmButton: false
-            });
-        @endif
-
-        @if(session('error'))
-            Swal.fire({
-                icon: 'error',
-                title: 'Erreur',
-                text: '{{ session('error') }}'
-            });
-        @endif
+    const select = document.getElementById('edit_employee_id');
+    select.innerHTML = '';
+    
+    reservation.service.employees.forEach(employee => {
+        const option = document.createElement('option');
+        option.value = employee.id;
+        option.textContent = employee.name;
+        option.selected = (employee.id == employeeId);
+        select.appendChild(option);
     });
 
-    document.getElementById('editReservationForm').addEventListener('submit', function(event) {
+    document.getElementById('editReservationModal').classList.remove('hidden');
+    
+    <!-- Ajoutez ceci après les messages de session existants -->
+    @if($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+}
+
+function showEditModalError(message) {
+    const errorDiv = document.getElementById('editModalError');
+    const errorMessage = document.getElementById('editModalErrorMessage');
+    
+    errorDiv.classList.remove('hidden');
+    errorMessage.textContent = message;
+    
+    setTimeout(() => {
+        errorDiv.classList.add('hidden');
+    }, 8000);
+}
+
+
+function closeEditModal() {
+    document.getElementById('editReservationModal').classList.add('hidden');
+    document.getElementById('editModalError').classList.add('hidden');
+}
+
+document.getElementById('editReservationForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const form = event.target;
@@ -191,7 +193,16 @@
     })
     .then(response => {
         if (!response.ok) {
-            return response.json().then(err => Promise.reject(err));
+            return response.json().then(err => {
+
+                if (response.status === 422 && err.errors) {
+                    const errors = Object.values(err.errors).flat();
+                    return Promise.reject({
+                        error: errors.join('\n')
+                    });
+                }
+                return Promise.reject(err);
+            });
         }
         return response.json();
     })
@@ -199,21 +210,14 @@
         Swal.fire({
             icon: 'success',
             title: 'Succès',
-            text: data.success,
+            text: data.success || 'Modification enregistrée avec succès',
             willClose: () => {
                 window.location.reload();
             }
         });
     })
     .catch(error => {
-        Swal.fire({
-            icon: 'error',
-            title: 'Erreur',
-            text: error.error || 'Une erreur est survenue',
-            didDestroy: () => {
-                document.getElementById('editReservationModal').classList.remove('hidden');
-            }
-        });
+        showEditModalError(error.error || 'Une erreur est survenue');
     });
 });
 </script>

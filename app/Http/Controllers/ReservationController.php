@@ -91,7 +91,6 @@ class ReservationController extends Controller
             $endTime = clone $startTime;
             $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
 
-            // Vérification de la disponibilité de l'employé
                 $isEmployeeAvailable = !Reservation::where('employee_id', $request->employee_id)
                 ->where(function($query) use ($startTime, $endTime) {
                     $query->whereBetween('datetime', [$startTime, $endTime])
@@ -155,30 +154,71 @@ class ReservationController extends Controller
         }
     }
 
+    public function editData(Reservation $reservation)
+    {
+        $employees = $reservation->service->employees;
+
+        return response()->json([
+            'reservation' => [
+                'status' => $reservation->status,
+                'notes' => $reservation->notes,
+            ],
+            'employees' => $employees
+        ]);
+    }
+
     public function update(UpdateReservationRequest $request, Reservation $reservation)
     {
         try {
+            // if ($reservation->client_id !== auth()->id()) {
+            //     abort(403, 'Accès refusé');
+            // }
+
             $startTime = new DateTime($request->datetime);
             $endTime = clone $startTime;
             $endTime->add(new DateInterval('PT' . $reservation->service->duration . 'M'));
-    
+
+            $isEmployeeAvailable = !Reservation::where('employee_id', $request->employee_id)
+                ->where('id', '!=', $reservation->id)
+                ->where(function($query) use ($startTime, $endTime) {
+                    $query->whereBetween('datetime', [$startTime, $endTime])
+                        ->orWhereBetween('end_time', [$startTime, $endTime])
+                        ->orWhere(function($q) use ($startTime, $endTime) {
+                            $q->where('datetime', '<', $startTime)
+                                ->where('end_time', '>', $endTime);
+                        });
+                })
+                ->whereNotIn('status', ['Done', 'Refused'])
+                ->exists();
+
+            if (!$isEmployeeAvailable) {
+                return back()
+                    ->withInput()
+                    ->with([
+                        'error' => 'L\'employé est indisponible à cette heure. Veuillez choisir un autre créneau.',
+                        'service_id' => $reservation->service_id
+                    ]);
+            }
+
             $reservation->update([
                 'employee_id' => $request->employee_id,
                 'datetime' => $startTime->format('Y-m-d H:i:s'),
                 'end_time' => $endTime->format('Y-m-d H:i:s'),
             ]);
-    
+
             if ($request->wantsJson()) {
                 return response()->json(['success' => 'Réservation mise à jour avec succès.']);
             }
-    
+
             return redirect()->route('client.reservations')->with('success', 'Réservation mise à jour avec succès.');
         } catch (Exception $e) {
             if ($request->wantsJson()) {
                 return response()->json(['error' => 'Erreur : ' . $e->getMessage()], 500);
             }
-    
-            return redirect()->route('client.reservations')->with('error', 'Erreur : ' . $e->getMessage());
+
+            return redirect()->route('client.reservations')
+                ->withInput()
+                ->with('error', 'Erreur : ' . $e->getMessage());
         }
     }
 

@@ -34,10 +34,6 @@ class UpdateReservationRequest extends FormRequest
                     if ($datetime->gt($endTime)) {
                         $fail('Les réservations ne sont pas acceptées après 16:00.');
                     }
-
-                    if ($datetime->isWeekend()) {
-                        $fail('Les réservations ne sont pas acceptées le week-end.');
-                    }
                 },
             ],
             'status' => 'nullable|in:pending,confirmed,cancelled,completed',
@@ -62,22 +58,27 @@ class UpdateReservationRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            if ($this->service_id && $this->datetime) {
-                $service = Service::find($this->service_id);
-                if ($service) {
-                    $proposedEnd = Carbon::parse($this->datetime)->addMinutes($service->duration);
-                    
-                    $conflictingReservation = Reservation::where('employee_id', $this->employee_id)
-                        ->where(function($query) use ($proposedEnd) {
-                            $query->whereBetween('datetime', [$this->datetime, $proposedEnd])
-                                  ->orWhereBetween('end_time', [$this->datetime, $proposedEnd]);
-                        })
-                        ->where('id', '!=', $this->route('reservation')->id)
-                        ->exists();
-
-                    if ($conflictingReservation) {
-                        $validator->errors()->add('datetime', 'L\'employé a déjà une réservation pendant ce créneau.');
-                    }
+            $reservation = $this->route('reservation');
+            $service = $reservation->service; 
+            
+            if ($this->datetime) {
+                $proposedEnd = Carbon::parse($this->datetime)->addMinutes($service->duration);
+                
+                $conflictingReservation = Reservation::where('employee_id', $this->employee_id)
+                    ->where(function($query) use ($proposedEnd) {
+                        $query->whereBetween('datetime', [$this->datetime, $proposedEnd])
+                              ->orWhereBetween('end_time', [$this->datetime, $proposedEnd])
+                              ->orWhere(function($q) use ($proposedEnd) {
+                                  $q->where('datetime', '<', $this->datetime)
+                                    ->where('end_time', '>', $proposedEnd);
+                              });
+                    })
+                    ->where('id', '!=', $reservation->id)
+                    ->whereNotIn('status', ['Done', 'Refused'])
+                    ->exists();
+    
+                if ($conflictingReservation) {
+                    $validator->errors()->add('datetime', 'L\'employé a déjà une réservation pendant ce créneau.');
                 }
             }
         });

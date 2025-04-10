@@ -141,7 +141,10 @@
                                     </button>
                                     
                                     @if($reservation->status !== 'Done' && $reservation->status !== 'Refused')
-                                        <a href="" class="text-indigo-600 hover:text-indigo-900 mr-3">Modifier</a>
+                                        <button onclick="openEditModal({{ $reservation->id }}, '{{ $reservation->datetime }}', {{ $reservation->employee_id }}, {{ $reservation->service_id }})" 
+                                            class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                            Modifier
+                                        </button>
                                         <form action="" method="POST" class="inline">
                                             @csrf
                                             @method('DELETE')
@@ -183,7 +186,7 @@
     </main>
 </div>
 
-<!-- Reservation Modal -->
+<!-- Reservation Details Modal -->
 <div id="reservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm" aria-hidden="true"></div>
@@ -230,7 +233,59 @@
                 <button type="button" onclick="closeReservationModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
                     Fermer
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<!-- Edit Reservation Modal -->
+<div id="editReservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm" aria-hidden="true"></div>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Modifier la réservation</h3>
+                <form id="editReservationForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="reservation_id" id="reservation_id">
+                    <input type="hidden" name="service_id" id="edit_service_id">
+                    
+                    <div class="mt-4">
+                        <label for="edit_status" class="block text-sm font-medium text-gray-700">Statut</label>
+                        <select name="status" id="edit_status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="Pending">En attente</option>
+                            <option value="Done">Confirmé</option>
+                            <option value="Refused">Annulé</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label for="edit_datetime" class="block text-sm font-medium text-gray-700">Date et heure</label>
+                        <input type="datetime-local" name="datetime" id="edit_datetime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label for="edit_employee_id" class="block text-sm font-medium text-gray-700">Employé</label>
+                        <select name="employee_id" id="edit_employee_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                            <!-- Options chargées dynamiquement -->
+                        </select>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <label for="edit_notes" class="block text-sm font-medium text-gray-700">Notes</label>
+                        <textarea name="notes" id="edit_notes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" onclick="closeEditModal()" class="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Annuler
+                        </button>
+                        <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -239,6 +294,7 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/fr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 function openReservationModal(service, client, employee, status, date, time, notes, reservationId) {
@@ -289,65 +345,193 @@ function openReservationModal(service, client, employee, status, date, time, not
     document.getElementById('reservationModal').classList.remove('hidden');
 }
 
-    function closeReservationModal() {
-        document.getElementById('reservationModal').classList.add('hidden');
-    }
+function closeReservationModal() {
+    document.getElementById('reservationModal').classList.add('hidden');
+}
 
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            locale: 'fr',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            events: [
-                @foreach($reservations as $reservation)
-                {
-                    title: '{{ $reservation->service->name }} - {{ $reservation->client->name }}',
-                    start: '{{ $reservation->datetime }}',
-                    end: '{{ $reservation->end_time }}',
-                    color: @switch($reservation->status)
-                                @case('Done') '#10B981' @break
-                                @case('Pending') '#F59E0B' @break
-                                @case('Refused') '#EF4444' @break
-                                @default '#6B7280'
-                            @endswitch,
-                    extendedProps: {
-                        client: '{{ $reservation->client->name }}',
-                        employee: '{{ $reservation->employee->name }}',
-                        service: '{{ $reservation->service->name }}',
-                        status: '{{ $reservation->status }}',
-                        date: '{{ \Carbon\Carbon::parse($reservation->datetime)->format('d/m/Y') }}',
-                        time: '{{ \Carbon\Carbon::parse($reservation->datetime)->format('H:i') }}',
-                        notes: '{{ $reservation->notes ?? 'Aucune note' }}',
-                        reservationId: '{{ $reservation->id }}'
-                    }
-                },
-                @endforeach
-            ],
-            eventClick: function(info) {
-                openReservationModal(
-                    info.event.extendedProps.service,
-                    info.event.extendedProps.client,
-                    info.event.extendedProps.employee,
-                    info.event.extendedProps.status,
-                    info.event.extendedProps.date,
-                    info.event.extendedProps.time,
-                    info.event.extendedProps.notes,
-                    info.event.extendedProps.reservationId
-                );
-            }
+function openEditModal(reservationId, datetime, employeeId, serviceId) {
+    console.log('Opening edit modal for:', reservationId);
+
+    Swal.fire({
+        title: 'Chargement...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+    });
+
+    fetch(`/admin/reservations/${reservationId}/edit-data`, {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Erreur réseau');
+        return response.json();
+    })
+    .then(data => {
+        Swal.close();
+        console.log('Data received:', data);
+
+        document.getElementById('reservation_id').value = reservationId;
+        document.getElementById('edit_datetime').value = datetime;
+        document.getElementById('edit_service_id').value = serviceId;
+        document.getElementById('edit_status').value = data.reservation.status;
+        document.getElementById('edit_notes').value = data.reservation.notes;
+
+        const select = document.getElementById('edit_employee_id');
+        select.innerHTML = '';
+        data.employees.forEach(emp => {
+            const option = new Option(emp.name, emp.id);
+            option.selected = emp.id == employeeId;
+            select.add(option);
         });
-        calendar.render();
 
-        document.getElementById('reservationModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeReservationModal();
-            }
+        document.getElementById('editReservationModal').classList.remove('hidden');
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Échec du chargement: ' + error.message
         });
     });
+}
+
+function closeEditModal() {
+    document.getElementById('editReservationModal').classList.add('hidden');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        events: [
+            @foreach($reservations as $reservation)
+            {
+                title: '{{ $reservation->service->name }} - {{ $reservation->client->name }}',
+                start: '{{ $reservation->datetime }}',
+                end: '{{ $reservation->end_time }}',
+                color: @switch($reservation->status)
+                            @case('Done') '#10B981' @break
+                            @case('Pending') '#F59E0B' @break
+                            @case('Refused') '#EF4444' @break
+                            @default '#6B7280'
+                        @endswitch,
+                extendedProps: {
+                    client: '{{ $reservation->client->name }}',
+                    employee: '{{ $reservation->employee->name }}',
+                    service: '{{ $reservation->service->name }}',
+                    status: '{{ $reservation->status }}',
+                    date: '{{ \Carbon\Carbon::parse($reservation->datetime)->format('d/m/Y') }}',
+                    time: '{{ \Carbon\Carbon::parse($reservation->datetime)->format('H:i') }}',
+                    notes: '{{ $reservation->notes ?? 'Aucune note' }}',
+                    reservationId: '{{ $reservation->id }}'
+                }
+            },
+            @endforeach
+        ],
+        eventClick: function(info) {
+            openReservationModal(
+                info.event.extendedProps.service,
+                info.event.extendedProps.client,
+                info.event.extendedProps.employee,
+                info.event.extendedProps.status,
+                info.event.extendedProps.date,
+                info.event.extendedProps.time,
+                info.event.extendedProps.notes,
+                info.event.extendedProps.reservationId
+            );
+        }
+    });
+    calendar.render();
+
+    document.getElementById('reservationModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeReservationModal();
+        }
+    });
+    
+    document.getElementById('editReservationModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+    
+    document.getElementById('editReservationForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const reservationId = formData.get('reservation_id');
+
+        fetch(`/reservations/${reservationId}`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'X-HTTP-Method-Override': 'PUT',
+                'Accept': 'application/json',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    // Gestion spécifique des erreurs de validation
+                    if (err.errors) {
+                        const firstError = Object.values(err.errors)[0][0];
+                        return Promise.reject(firstError);
+                    }
+                    return Promise.reject(err.error || 'Une erreur est survenue');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Succès',
+                text: data.message,
+                willClose: () => {
+                    window.location.reload();
+                }
+            });
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: typeof error === 'string' ? error : error.message || 'Une erreur est survenue',
+                didDestroy: () => {
+                    document.getElementById('editReservationModal').classList.remove('hidden');
+                }
+            });
+        });
+    });
+    
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Succès',
+            text: '{{ session('success') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: '{{ session('error') }}'
+        });
+    @endif
+});
 </script>
 @endsection
