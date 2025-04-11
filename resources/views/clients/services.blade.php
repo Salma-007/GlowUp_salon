@@ -111,6 +111,7 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
     function openReservationModal(serviceId, serviceName, employees) {
@@ -187,6 +188,17 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+        @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Succès',
+            text: '{{ session('success') }}',
+            timer: 3000,
+            timerProgressBar: true,
+            showConfirmButton: false
+        });
+        @endif
+
         @if($errors->any() || session('error'))
             const serviceId = {{ old('service_id', session('service_id')) ?? 'null' }};
             if (serviceId) {

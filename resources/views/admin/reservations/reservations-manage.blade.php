@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => {
             if (!response.ok) {
                 return response.json().then(err => {
-                    // Gestion spécifique des erreurs de validation
+                    
                     if (err.errors) {
                         const firstError = Object.values(err.errors)[0][0];
                         return Promise.reject(firstError);

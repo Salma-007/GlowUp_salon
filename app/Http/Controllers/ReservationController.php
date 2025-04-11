@@ -123,7 +123,7 @@ class ReservationController extends Controller
 
             event(new ReservationCreated($reservation));
             
-            return redirect()->route('clients.reservations.client_reservations')->with('success', 'Réservation créée avec succès.');
+            return redirect()->back()->with('success', 'Réservation créée avec succès.');
             
         } catch (Exception $e) {
 
