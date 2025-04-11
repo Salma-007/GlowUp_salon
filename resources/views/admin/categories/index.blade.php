@@ -4,14 +4,41 @@
 <div class="flex-1 flex flex-col overflow-hidden">
     <!-- Header -->
     <header class="bg-white shadow-md sticky top-0 z-10">
-        <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-            <h1 class="text-xl font-bold text-gray-800">Gestion des Catégories</h1>
-            <button onclick="openAddCategoryModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 flex items-center">
+    <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        <h1 class="text-xl font-bold text-gray-800">Gestion des Catégories</h1>
+        
+        <!-- Conteneur pour aligner le bouton et l'utilisateur -->
+        <div class="flex items-center gap-4 ml-auto">
+            <!-- Bouton Ajouter une Catégorie -->
+            @if(auth()->user()->hasRole('admin'))
+            <button onclick="openAddCategoryModal()" 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 flex items-center">
                 <i class="fas fa-plus mr-2"></i>
                 Ajouter une Catégorie
             </button>
+            @endif
+            <!-- Profil utilisateur -->
+            <div class="relative">
+                <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    <span class="sr-only">Ouvrir le menu utilisateur</span>
+                    <div class="flex items-center">
+                        @if(Auth::user()->photo)
+                            <img class="h-8 w-8 rounded-full object-cover" 
+                                src="{{ asset('storage/' . Auth::user()->photo) }}" 
+                                alt="Photo de profil de {{ Auth::user()->name }}">
+                        @else
+                            <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-user text-gray-500"></i>
+                            </div>
+                        @endif
+                        <span class="hidden md:block ml-2 text-gray-700">{{ Auth::user()->name }}</span>
+                    </div>
+                </button>
+            </div>
         </div>
-    </header>
+    </div>
+</header>
+
 
     <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gray-50">

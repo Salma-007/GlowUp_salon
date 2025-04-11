@@ -20,10 +20,13 @@ class ReservationController extends Controller
     public function index()
     {
         try {
-            
+            Reservation::where('end_time', '<', now())
+            ->whereNotIn('status', ['Done', 'Refused'])
+            ->update(['status' => 'Done']);
+
             $reservations = Reservation::with(['client', 'employee', 'service'])
-            ->orderBy('datetime', 'asc')
-            ->get();
+            ->orderBy('datetime', 'desc')
+            ->paginate(6);
             return view('admin.reservations.reservations-manage', compact('reservations'));
 
         } catch (Exception $e) {
@@ -31,12 +34,30 @@ class ReservationController extends Controller
         }
     }
 
+    public function userReservations()
+    {
+        try {
+            $user = auth()->user();
+            
+            $reservations = Reservation::with(['client', 'employee', 'service'])
+                ->where('client_id', $user->id)
+                ->orWhere('employee_id', $user->id)
+                ->orderBy('datetime', 'asc')
+                ->paginate(10);
+                
+            return view('employees.planning.show', compact('reservations', 'user'));
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', 'Une erreur est survenue: ' . $e->getMessage());
+        }
+    }
+
 
     public function create()
     {
         try {
-            // $clients = User::where('role_id', 'client')->get(); 
-            $employees = User::whereNotIn('role_id', [2, 4])->get();
+            $employees = User::whereDoesntHave('roles', function ($query) {
+                $query->whereIn('name', ['client', 'admin']);
+            })->get();
             $services = Service::all(); 
             return view('clients.reservations.create', compact( 'employees', 'services'));
 
@@ -45,10 +66,19 @@ class ReservationController extends Controller
         }
     }
 
+
+    public function getEmployeesByService($serviceId)
+    {
+        $employees = User::whereHas('services', function($query) use ($serviceId) {
+            $query->where('services.id', $serviceId);
+        })->get();
+
+        return response()->json($employees);
+    }
+
     public function store(StoreReservationRequest $request)
     {
         try {
-
             if (!Auth::check()) {
                 return redirect()->route('login');
             }
@@ -61,6 +91,27 @@ class ReservationController extends Controller
             $endTime = clone $startTime;
             $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
 
+                $isEmployeeAvailable = !Reservation::where('employee_id', $request->employee_id)
+                ->where(function($query) use ($startTime, $endTime) {
+                    $query->whereBetween('datetime', [$startTime, $endTime])
+                        ->orWhereBetween('end_time', [$startTime, $endTime])
+                        ->orWhere(function($q) use ($startTime, $endTime) {
+                            $q->where('datetime', '<', $startTime)
+                                ->where('end_time', '>', $endTime);
+                        });
+                })
+                ->whereNotIn('status', ['cancelled', 'refused'])
+                ->exists();
+
+                if (!$isEmployeeAvailable) {
+                    return back()
+                        ->withInput()
+                        ->with([
+                            'error' => 'Empolyé est indisponible à cette heure. Veuillez choisir un autre créneau.',
+                            'service_id' => $request->service_id
+                        ]);
+                }
+
             $reservation = Reservation::create([
                 'client_id' => $client->id,
                 'employee_id' => $request->employee_id,
@@ -72,7 +123,7 @@ class ReservationController extends Controller
 
             event(new ReservationCreated($reservation));
             
-            return redirect()->route('home')->with('success', 'Réservation créée avec succès.');
+            return redirect()->back()->with('success', 'Réservation créée avec succès.');
             
         } catch (Exception $e) {
 
@@ -99,30 +150,77 @@ class ReservationController extends Controller
             return view('reservations.edit', compact('reservation', 'clients', 'employees', 'services'));
 
         } catch (Exception $e) {
-
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la préparation du formulaire de modification.' . $e->getMessage());
         }
     }
 
-    public function update(UpdateReservationRequest $request, Reservation $reservation)
-{
-    try {
-        $startTime = new DateTime($request->datetime);
-        $endTime = clone $startTime;
-        $endTime->add(new DateInterval('PT' . $reservation->service->duration . 'M'));
+    public function editData(Reservation $reservation)
+    {
+        $employees = $reservation->service->employees;
 
-        // On ne met à jour que les champs modifiables
-        $reservation->update([
-            'employee_id' => $request->employee_id,
-            'datetime' => $startTime->format('Y-m-d H:i:s'),
-            'end_time' => $endTime->format('Y-m-d H:i:s'),
+        return response()->json([
+            'reservation' => [
+                'status' => $reservation->status,
+                'notes' => $reservation->notes,
+            ],
+            'employees' => $employees
         ]);
-
-        return redirect()->route('client.reservations')->with('success', 'Réservation mise à jour avec succès.');
-    } catch (Exception $e) {
-        return redirect()->route('client.reservations')->with('error', 'Erreur : ' . $e->getMessage());
     }
-}
+
+    public function update(UpdateReservationRequest $request, Reservation $reservation)
+    {
+        try {
+            // if ($reservation->client_id !== auth()->id()) {
+            //     abort(403, 'Accès refusé');
+            // }
+
+            $startTime = new DateTime($request->datetime);
+            $endTime = clone $startTime;
+            $endTime->add(new DateInterval('PT' . $reservation->service->duration . 'M'));
+
+            $isEmployeeAvailable = !Reservation::where('employee_id', $request->employee_id)
+                ->where('id', '!=', $reservation->id)
+                ->where(function($query) use ($startTime, $endTime) {
+                    $query->whereBetween('datetime', [$startTime, $endTime])
+                        ->orWhereBetween('end_time', [$startTime, $endTime])
+                        ->orWhere(function($q) use ($startTime, $endTime) {
+                            $q->where('datetime', '<', $startTime)
+                                ->where('end_time', '>', $endTime);
+                        });
+                })
+                ->whereNotIn('status', ['Done', 'Refused'])
+                ->exists();
+
+            if (!$isEmployeeAvailable) {
+                return back()
+                    ->withInput()
+                    ->with([
+                        'error' => 'L\'employé est indisponible à cette heure. Veuillez choisir un autre créneau.',
+                        'service_id' => $reservation->service_id
+                    ]);
+            }
+
+            $reservation->update([
+                'employee_id' => $request->employee_id,
+                'datetime' => $startTime->format('Y-m-d H:i:s'),
+                'end_time' => $endTime->format('Y-m-d H:i:s'),
+            ]);
+
+            if ($request->wantsJson()) {
+                return response()->json(['success' => 'Réservation mise à jour avec succès.']);
+            }
+
+            return redirect()->route('client.reservations')->with('success', 'Réservation mise à jour avec succès.');
+        } catch (Exception $e) {
+            if ($request->wantsJson()) {
+                return response()->json(['error' => 'Erreur : ' . $e->getMessage()], 500);
+            }
+
+            return redirect()->route('client.reservations')
+                ->withInput()
+                ->with('error', 'Erreur : ' . $e->getMessage());
+        }
+    }
 
     public function destroy(Reservation $reservation)
     {
@@ -144,15 +242,14 @@ class ReservationController extends Controller
 
     public function clientReservations()
     {
-        $employees = User::whereNotIn('role_id', [2, 4])->get();
         $client = Auth::user();
 
-        $reservations = Reservation::with(['service', 'employee'])
-            ->where('client_id', $client->id)
-            ->orderBy('datetime', 'desc')
-            ->get();
+        $reservations = Reservation::with(['service', 'employee', 'service.employees'])
+        ->where('client_id', $client->id)
+        ->orderBy('datetime', 'desc')
+        ->get();
 
-        return view('clients.reservations.client_reservations', compact('reservations','employees'));
+        return view('clients.reservations.client_reservations', compact('reservations'));
     }
 
 }

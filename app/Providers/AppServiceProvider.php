@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Repositories\AuthRepository;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use App\Interfaces\AuthRepositoryInterface;
 
@@ -21,6 +22,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::define('admin', function ($user) {
+            return $user->role === 'admin';
+        });
     }
 }

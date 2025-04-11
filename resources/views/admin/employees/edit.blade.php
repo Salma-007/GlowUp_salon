@@ -22,11 +22,21 @@
                 <div class="relative">
                     <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
                         <span class="sr-only">Ouvrir le menu utilisateur</span>
+                        <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
+                        <span class="sr-only">Ouvrir le menu utilisateur</span>
                         <div class="flex items-center">
-                            <img class="h-8 w-8 rounded-full object-cover border-2 border-gray-200" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="Photo de profil">
-                            <span class="hidden md:block ml-2 text-gray-700">Admin</span>
-                            <i class="fas fa-chevron-down ml-1 text-xs text-gray-500"></i>
+                        @if(Auth::user()->photo)
+                            <img class="h-8 w-8 rounded-full object-cover" 
+                                src="{{ asset('storage/' . Auth::user()->photo) }}" 
+                                alt="Photo de profil de {{ Auth::user()->name }}">
+                        @else
+                            <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                <i class="fas fa-user text-gray-500"></i>
+                            </div>
+                        @endif
+                            <span class="hidden md:block ml-2 text-gray-700">{{ Auth::user()->name }}</span>
                         </div>
+                    </button>
                     </button>
                 </div>
             </div>
@@ -117,7 +127,34 @@
                         </div>
                     </div>
                 </div>
-                
+                <!-- Services -->
+                <div class="mb-6 col-span-2">
+                    <label class="block text-gray-800 font-bold mb-2">Services associés</label>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        @foreach($services as $service)
+                            <div class="flex items-center">
+                                <input type="checkbox" 
+                                    id="service_{{ $service->id }}" 
+                                    name="services[]" 
+                                    value="{{ $service->id }}"
+                                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                    {{ in_array($service->id, old('services', $employeeServices ?? [])) ? 'checked' : '' }}>
+                                
+                                <label for="service_{{ $service->id }}" class="ml-2">
+                                    {{ $service->name }}
+                                    @if($service->category)
+                                        <span class="text-xs text-gray-500">({{ $service->category->name }})</span>
+                                    @endif
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    
+                    @error('services.*')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
                 <!-- Ligne de séparation -->
                 <div class="border-t border-gray-200 mt-8 mb-6"></div>
                 

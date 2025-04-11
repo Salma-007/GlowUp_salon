@@ -178,12 +178,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/l10n/fr.min.js"></script>
     <script>
-        // Toggle mobile menu
         document.getElementById('mobile-menu-button').addEventListener('click', function() {
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
-        // Toggle user dropdown
         document.getElementById('user-menu-button').addEventListener('click', function(event) {
             event.stopPropagation();
             const menu = document.getElementById('user-menu');
@@ -194,12 +192,10 @@
             menu.classList.toggle('scale-95');
             menu.classList.toggle('scale-100');
             
-            // Update aria-expanded
             const isExpanded = menu.classList.contains('hidden') ? 'false' : 'true';
             this.setAttribute('aria-expanded', isExpanded);
         });
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('user-menu');
             const button = document.getElementById('user-menu-button');

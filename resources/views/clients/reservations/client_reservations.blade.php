@@ -6,109 +6,75 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h1 class="text-3xl font-bold text-gray-900 mb-8">Mes Réservations</h1>
 
-        <!-- Afficher un message de succès -->
         @if (session('success'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
                 {{ session('success') }}
             </div>
         @endif
 
-        <!-- Afficher un message d'erreur -->
         @if (session('error'))
             <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
                 {{ session('error') }}
             </div>
         @endif
 
-        <!-- Liste des réservations -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg">
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Service
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date et Heure
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Employé
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Statut
-                        </th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Actions
-                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date et Heure</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employé</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse ($reservations as $reservation)
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ $reservation->service->name }}
-                                </div>
-                                <div class="text-sm text-gray-500">
-                                    {{ $reservation->service->description }}
-                                </div>
+                                <div class="text-sm font-medium text-gray-900">{{ $reservation->service->name }}</div>
+                                <div class="text-sm text-gray-500">{{ Str::limit($reservation->service->description, 30, '...') }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ \Carbon\Carbon::parse($reservation->datetime)->format('d/m/Y H:i') }}
-                                </div>
+                                <div class="text-sm text-gray-900">{{ \Carbon\Carbon::parse($reservation->datetime)->format('d/m/Y H:i') }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900">
-                                    {{ $reservation->employee->name }}
-                                </div>
+                                <div class="text-sm text-gray-900">{{ $reservation->employee->name }}</div>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap"> 
-                                @if ($reservation->status === 'Pending') 
-                                    <span class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full">
-                                        En attente
-                                    </span>
-                                @elseif ($reservation->status === 'Done') 
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                                        Terminée
-                                    </span>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if ($reservation->status === 'Pending')
+                                    <span class="px-2 py-1 bg-amber-100 text-amber-800 text-xs rounded-full">En attente</span>
+                                @elseif ($reservation->status === 'Done')
+                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Terminée</span>
                                 @elseif ($reservation->status === 'Refused')
-                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                                        Refusée
-                                    </span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Refusée</span>
                                 @else
-                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
-                                        Statut inconnu ({{ $reservation->status }})
-                                    </span>
+                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">Statut inconnu ({{ $reservation->status }})</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                            @if($reservation->status !== 'Refused')
-                                <!-- Bouton pour ouvrir le modal de modification -->
-                                <button onclick="openEditModal({{ $reservation->id }}, '{{ $reservation->datetime }}', {{ $reservation->employee_id }})" 
-                                        class="text-indigo-600 hover:text-indigo-900 mr-2">
-                                    Modifier
-                                </button>
-
-                                <!-- Formulaire pour supprimer la réservation -->
-                                <form action="{{ route('reservations.destroy', $reservation->id) }}" method="POST" class="inline-block">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:text-red-900" 
-                                            onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
-                                        Annuler
+                                @if($reservation->status !== 'Refused' && $reservation->status !== 'Done')
+                                    <button onclick="openEditModal({{ $reservation->id }}, '{{ $reservation->datetime }}', {{ $reservation->employee_id }})" 
+                                            class="text-indigo-600 hover:text-indigo-900 mr-2">
+                                        Modifier
                                     </button>
-                                </form>
-                            @else
-                                <span class="text-gray-400">Aucune action disponible</span>
-                            @endif
-                        </td>
+                                    <form action="{{ route('reservations.destroy', $reservation->id) }}" method="POST" class="inline-block">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900" 
+                                                onclick="return confirm('Êtes-vous sûr de vouloir annuler cette réservation ?')">
+                                            Annuler
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-gray-400">Aucune action disponible</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
-                                Aucune réservation trouvée.
-                            </td>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Aucune réservation trouvée.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -116,42 +82,30 @@
         </div>
     </div>
 
-    <!-- Modal pour la modification -->
+    <!-- Modal -->
     <div id="editReservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <!-- Fond flou -->
         <div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm" aria-hidden="true"></div>
-
-        <!-- Contenu de la modal -->
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <h3 class="text-lg font-medium leading-6 text-gray-900" id="modalTitle">Modifier la réservation</h3>
-
-                    <!-- Formulaire de modification -->
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">Modifier la réservation</h3>
+                    <div id="editModalError" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
+                        <p id="editModalErrorMessage"></p>
+                    </div>
                     <form id="editReservationForm" method="POST">
                         @csrf
                         @method('PUT')
-
-                        <!-- Champ caché pour l'ID de la réservation -->
                         <input type="hidden" name="reservation_id" id="reservation_id">
-
-                        <!-- Sélection de la date et heure -->
                         <div class="mt-4">
                             <label for="edit_datetime" class="block text-sm font-medium text-gray-700">Date et heure</label>
                             <input type="datetime-local" name="datetime" id="edit_datetime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
                         </div>
-
-                        <!-- Sélection de l'employé -->
                         <div class="mt-4">
                             <label for="edit_employee_id" class="block text-sm font-medium text-gray-700">Choisir un employé</label>
                             <select name="employee_id" id="edit_employee_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                                @foreach($employees as $employee)
-                                    <option value="{{ $employee->id }}">{{ $employee->name }}</option>
-                                @endforeach
+                                <!-- Options chargées dynamiquement -->
                             </select>
                         </div>
-
-                        <!-- Boutons de la modal -->
                         <div class="mt-6 flex justify-end">
                             <button type="button" onclick="closeEditModal()" class="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 Annuler
@@ -168,73 +122,103 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    // Fonction pour ouvrir le modal de modification
-    function openEditModal(reservationId, datetime, employeeId) {
-        // Pré-remplir le formulaire
-        document.getElementById('reservation_id').value = reservationId;
-        document.getElementById('edit_datetime').value = datetime;
-        document.getElementById('edit_employee_id').value = employeeId;
 
-        // Afficher le modal
-        document.getElementById('editReservationModal').classList.remove('hidden');
-    }
+function openEditModal(reservationId, datetime, employeeId) {
+    const reservation = {!! $reservations->toJson() !!}.find(r => r.id === reservationId);
+    
+    document.getElementById('reservation_id').value = reservationId;
 
-    // Fonction pour fermer le modal de modification
-    function closeEditModal() {
-        document.getElementById('editReservationModal').classList.add('hidden');
-    }
+    document.getElementById('edit_datetime').value = datetime.replace(' ', 'T');
 
-    // Fermer le modal en cliquant à l'extérieur
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('editReservationModal');
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal) {
-                closeEditModal();
-            }
-        });
+    const select = document.getElementById('edit_employee_id');
+    select.innerHTML = '';
+    
+    reservation.service.employees.forEach(employee => {
+        const option = document.createElement('option');
+        option.value = employee.id;
+        option.textContent = employee.name;
+        option.selected = (employee.id == employeeId);
+        select.appendChild(option);
     });
 
-    // Soumettre le formulaire de modification
-    document.getElementById('editReservationForm').addEventListener('submit', function(event) {
-        event.preventDefault();
+    document.getElementById('editReservationModal').classList.remove('hidden');
+    
+    <!-- Ajoutez ceci après les messages de session existants -->
+    @if($errors->any())
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+            <ul>
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+}
 
-        const form = event.target;
-        const formData = new FormData(form);
-        const reservationId = formData.get('reservation_id');
+function showEditModalError(message) {
+    const errorDiv = document.getElementById('editModalError');
+    const errorMessage = document.getElementById('editModalErrorMessage');
+    
+    errorDiv.classList.remove('hidden');
+    errorMessage.textContent = message;
+    
+    setTimeout(() => {
+        errorDiv.classList.add('hidden');
+    }, 8000);
+}
 
-        fetch(`/reservations/${reservationId}`, {
+
+function closeEditModal() {
+    document.getElementById('editReservationModal').classList.add('hidden');
+    document.getElementById('editModalError').classList.add('hidden');
+}
+
+document.getElementById('editReservationForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const reservationId = formData.get('reservation_id');
+
+    fetch(`/reservations/${reservationId}`, {
         method: 'POST',
         body: formData,
         headers: {
             'X-CSRF-TOKEN': '{{ csrf_token() }}',
             'X-HTTP-Method-Override': 'PUT',
-            'Accept': 'application/json', 
+            'Accept': 'application/json',
         }
     })
-    .then(async response => {
-        if (response.ok) {
-            window.location.reload();
-        } else {
-            const data = await response.json(); 
-            let errorMessage = "Erreur lors de la modification.";
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
 
-
-            if (data.errors) {
-                errorMessage = Object.values(data.errors).join('\n');
-            } 
-
-            else if (data.message) {
-                errorMessage = data.message;
-            }
-
-            alert(errorMessage);
+                if (response.status === 422 && err.errors) {
+                    const errors = Object.values(err.errors).flat();
+                    return Promise.reject({
+                        error: errors.join('\n')
+                    });
+                }
+                return Promise.reject(err);
+            });
         }
+        return response.json();
+    })
+    .then(data => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Succès',
+            text: data.success || 'Modification enregistrée avec succès',
+            willClose: () => {
+                window.location.reload();
+            }
+        });
     })
     .catch(error => {
-        console.error('Erreur:', error);
-        alert("Erreur réseau ou serveur.");
+        showEditModalError(error.error || 'Une erreur est survenue');
     });
-    });
+});
 </script>
 @endsection

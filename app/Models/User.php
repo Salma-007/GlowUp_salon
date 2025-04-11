@@ -3,8 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Exception;
 use App\Models\Role;
+use App\Models\Service;
 use App\Models\Planning;
+use App\Models\Reservation;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -36,9 +39,18 @@ class User extends Authenticatable
 
     public function hasPermission($permissionName)
     {
-        return $this->role->permissions->contains('name', $permissionName);
+        foreach ($this->roles as $role) {
+            if ($role->permissions->contains('name', $permissionName)) {
+                return true;
+            }
+        }
+        return false;
     }
-
+    
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'client_id');
+    }
 
     public function hasRole($role)
     {
@@ -50,6 +62,19 @@ class User extends Authenticatable
         return $this->hasMany(Planning::class, 'employee_id');
     }
 
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'employee_service');
+    }
+
+    public function getEmployeesByService($serviceId)
+    {
+        try {
+            return Service::findOrFail($serviceId)->employees;
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Service non trouvé'], 404);
+        }
+    }
     
     /**
      * The attributes that should be hidden for serialization.
