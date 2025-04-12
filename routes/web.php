@@ -25,9 +25,12 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/admin/reservations/{reservation}/edit-data', [ReservationController::class, 'editData'])
     ->name('admin.reservations.edit-data');
-    Route::put('/admin/reservations/{reservation}', [ReservationController::class, 'update'])
+    // Route::put('/admin/reservations/{reservation}', [ReservationController::class, 'update'])
+    // ->name('admin.reservations.update');
+    Route::put('admin/reservations/{reservation}', [ReservationController::class, 'adminUpdate'])
     ->name('admin.reservations.update');
-    
+
+
     Route::get('/reservations/add', [ReservationController::class, 'create'])->name("reservation-ajout")->middleware('role:client');
     Route::post('/reservations/ajout', [ReservationController::class, 'store'])->name("new_reservation")->middleware('role:client');
     Route::get('/mes-reservations', [ReservationController::class, 'clientReservations'])->name('client.reservations')->middleware('role:client');
@@ -93,13 +96,19 @@ Route::middleware(['auth', 'admin'])->group(function () {
     
 });
 
-// update profil
+// update profil client
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.update-photo');
 });
 
+// update profil employé
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/dashboard/profile', [ProfileController::class, 'updateEmployee'])->name('profile.update');
+    Route::put('/dashboard/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+});
 
 
 // manage authentication

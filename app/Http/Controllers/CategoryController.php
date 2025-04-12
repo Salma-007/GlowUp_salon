@@ -9,13 +9,16 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
-        $categories = Category::all();
-        return view('admin.categories.index', compact('categories'));
+        $categories = Category::withCount('services') 
+        ->orderBy('name') 
+        ->paginate(3); 
+
+        $totalCategories = $categories->total();
+
+        return view('admin.categories.index', compact('categories', 'totalCategories'));
     }
 
     public function store(Request $request)

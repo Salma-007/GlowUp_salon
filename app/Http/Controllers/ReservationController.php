@@ -20,20 +20,35 @@ class ReservationController extends Controller
     public function index()
     {
         try {
-            Reservation::where('end_time', '<', now())
-            ->whereNotIn('status', ['Done', 'Refused'])
-            ->update(['status' => 'Done']);
+            $now = now()->timezone(config('app.timezone'));
+            
+            Reservation::where('end_time', '<', $now)
+                ->whereNotIn('status', ['Done', 'Refused'])
+                ->update(['status' => 'Done']);
 
-            $reservations = Reservation::with(['client', 'employee', 'service'])
-            ->orderBy('datetime', 'desc')
-            ->paginate(6);
-            return view('admin.reservations.reservations-manage', compact('reservations'));
+            $paginatedReservations = Reservation::with(['client', 'employee', 'service'])
+                ->orderBy('datetime', 'desc')
+                ->paginate(6);
 
+            $calendarReservations = Reservation::with(['client', 'employee', 'service'])
+                ->orderBy('datetime', 'asc')
+                ->get()
+                ->map(function ($reservation) {
+                    $reservation->datetime = \Carbon\Carbon::parse($reservation->datetime)
+                        ->timezone(config('app.timezone'))
+                        ->format('Y-m-d H:i:s');
+                    return $reservation;
+                });
+        
+            return view('admin.reservations.reservations-manage', [
+                'reservations' => $paginatedReservations,
+                'calendarReservations' => $calendarReservations
+            ]);
+        
         } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des réservations.' . $e->getMessage());
+            return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des réservations: ' . $e->getMessage());
         }
     }
-
     public function userReservations()
     {
         try {
@@ -250,6 +265,50 @@ class ReservationController extends Controller
         ->get();
 
         return view('clients.reservations.client_reservations', compact('reservations'));
+    }
+
+    public function adminUpdate(UpdateReservationRequest $request, Reservation $reservation)
+    {
+        try {
+            $startTime = new DateTime($request->datetime);
+            $endTime = clone $startTime;
+            $endTime->add(new DateInterval('PT' . $reservation->service->duration . 'M'));
+
+            $isEmployeeAvailable = !Reservation::where('employee_id', $request->employee_id)
+                ->where('id', '!=', $reservation->id)
+                ->where(function($query) use ($startTime, $endTime) {
+                    $query->whereBetween('datetime', [$startTime, $endTime])
+                        ->orWhereBetween('end_time', [$startTime, $endTime])
+                        ->orWhere(function($q) use ($startTime, $endTime) {
+                            $q->where('datetime', '<', $startTime)
+                                ->where('end_time', '>', $endTime);
+                        });
+                })
+                ->whereNotIn('status', ['Done', 'Refused'])
+                ->exists();
+
+            if (!$isEmployeeAvailable) {
+                return response()->json([
+                    'error' => 'L\'employé est indisponible à cette heure. Veuillez choisir un autre créneau.'
+                ], 422);
+            }
+
+            $reservation->update([
+                'employee_id' => $request->employee_id,
+                'datetime' => $startTime,
+                'end_time' => $endTime,
+                'status' => $request->status,
+            ]);
+
+            return response()->json([
+                'success' => 'Réservation mise à jour avec succès'
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Une erreur est survenue: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
 }

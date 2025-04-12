@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Requests\UpdatePasswordRequest;
 use App\Http\Requests\UpdateProfilePhotoRequest;
+use App\Http\Requests\UpdateProfileEmployeeRequest;
 
 class ProfileController extends Controller
 {
@@ -43,5 +45,38 @@ class ProfileController extends Controller
         auth()->user()->update(['photo' => $path]);
 
         return back()->with('success', 'Photo de profil mise à jour');
+    }
+
+    public function edit()
+    {
+        return view('admin.profile');
+    }
+
+    public function updateEmployee(UpdateProfileEmployeeRequest $request)
+    {
+        $user = auth()->user();
+        $data = $request->validated();
+
+        if ($request->hasFile('photo')) {
+
+            if ($user->photo) {
+                Storage::delete('public/'.$user->photo);
+            }
+
+            $data['photo'] = $request->file('photo')->store('profile-photos', 'public');
+        }
+
+        $user->update($data);
+
+        return back()->with('success', 'Profil mis à jour avec succès');
+    }
+
+    public function updatePassword(UpdatePasswordRequest $request)
+    {
+        auth()->user()->update([
+            'password' => Hash::make($request->password)
+        ]);
+
+        return back()->with('success', 'Mot de passe mis à jour avec succès');
     }
 }

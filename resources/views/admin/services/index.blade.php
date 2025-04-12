@@ -183,7 +183,7 @@
                                     <div class="text-sm text-gray-900">{{ number_format($service->price, 2) }}€</div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {{ $service->reservations_count ?? 0 }} ce mois
+                                    {{ $service->reservations_count }} ce mois
                                 </td>
                                 @if(auth()->user()->hasRole('admin'))
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

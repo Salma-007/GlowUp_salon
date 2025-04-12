@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="flex-1 flex flex-col overflow-hidden">
-    <!-- Header -->
+    <!-- Header amélioré -->
     <header class="bg-white shadow-md sticky top-0 z-10">
     <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
         <h1 class="text-xl font-bold text-gray-800">Gestion des Catégories</h1>
@@ -39,26 +39,62 @@
     </div>
 </header>
 
-
     <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gray-50">
-        <div class="max-w-7xl mx-auto">
-            <!-- Liste des Catégories -->
-            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
-                <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-                    <h3 class="text-lg leading-6 font-medium text-gray-900">Liste des Catégories</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">Gérez les catégories de services</p>
-                    @if (session('success'))
-                        <div class="alert alert-success bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                            {{ session('success') }}
-                        </div>
-                    @endif
+        <div class="max-w-7xl mx-auto space-y-6">
+            <!-- Messages flash stylés -->
+            @if (session('success'))
+            <div class="p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 text-green-500">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-green-700">{{ session('success') }}</p>
+                    </div>
+                </div>
+            </div>
+            @endif
 
-                    @if (session('error'))
-                        <div class="alert alert-error bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                            {{ session('error') }}
+            @if (session('error'))
+            <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 text-red-500">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">{{ session('error') }}</p>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Carte des statistiques -->
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+                <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 bg-indigo-100 rounded-md p-3">
+                                <i class="fas fa-tags text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="ml-5">
+                                <h3 class="text-lg font-medium text-gray-500">Total Catégories</h3>
+                                <p class="mt-1 text-3xl font-semibold text-gray-900">{{ $totalCategories }}</p>
+                            </div>
                         </div>
-                    @endif
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tableau amélioré -->
+            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+                <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">Liste des Catégories</h3>
+                            <p class="mt-1 text-sm text-gray-500">Toutes les catégories disponibles dans votre système</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -70,15 +106,27 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @foreach($categories as $category)
-                            <tr>
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $category->name }}</div>
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 rounded-md bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                                            <i class="fas fa-tag"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">{{ $category->name }}</div>
+                                            <div class="text-sm text-gray-500">{{ $category->services_count }} services</div>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button onclick="openEditCategoryModal({{ $category->id }}, '{{ $category->name }}')" class="text-indigo-600 hover:text-indigo-900 mr-3">
-                                        <i class="fas fa-edit"></i>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                    <button onclick="openEditCategoryModal({{ $category->id }}, '{{ $category->name }}')" 
+                                        class="text-indigo-600 hover:text-indigo-900 p-2 rounded-full hover:bg-indigo-50 transition-colors"
+                                        title="Modifier">
+                                        <i class="fas fa-pencil-alt"></i>
                                     </button>
-                                    <button onclick="confirmDeleteCategory({{ $category->id }})" class="text-red-600 hover:text-red-900">
+                                    <button onclick="confirmDeleteCategory({{ $category->id }})" 
+                                        class="text-red-600 hover:text-red-900 p-2 rounded-full hover:bg-red-50 transition-colors"
+                                        title="Supprimer">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -87,49 +135,90 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                    {{ $categories->links() }}
+                </div>
             </div>
         </div>
     </main>
 </div>
 
-<!-- Modal pour Ajouter une Catégorie -->
-<div id="addCategoryModal" class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-1/3 p-6">
-        <div class="text-center">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Ajouter une Catégorie</h3>
-            <form action="{{ route('admin.categories.store') }}" method="POST" class="mt-4">
-                @csrf
-                <input type="text" name="name" placeholder="Nom de la catégorie" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                <div class="mt-6 flex justify-end">
-                    <button type="button" onclick="closeAddCategoryModal()" class="mr-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Annuler</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Ajouter</button>
+<!-- Modals améliorés -->
+<div id="addCategoryModal" class="hidden fixed inset-0 z-50 overflow-y-auto backdrop-blur-sm">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0  bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="fas fa-plus text-blue-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Ajouter une Catégorie</h3>
+                        <div class="mt-4">
+                            <form action="{{ route('admin.categories.store') }}" method="POST">
+                                @csrf
+                                <input type="text" name="name" placeholder="Nom de la catégorie" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <div class="mt-6 flex justify-end space-x-3">
+                                    <button type="button" onclick="closeAddCategoryModal()" 
+                                        class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        Annuler
+                                    </button>
+                                    <button type="submit" 
+                                        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        Créer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modal pour Modifier une Catégorie -->
-<div id="editCategoryModal" class="hidden fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white rounded-lg shadow-xl w-11/12 md:w-1/2 lg:w-1/3 p-6">
-        <div class="text-center">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Modifier la Catégorie</h3>
-            <form id="editCategoryForm" method="POST" class="mt-4">
-                @csrf
-                @method('PUT')
-                <input type="hidden" id="editCategoryId" name="id">
-                <input type="text" id="editCategoryName" name="name" placeholder="Nom de la catégorie" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                <div class="mt-6 flex justify-end">
-                    <button type="button" onclick="closeEditCategoryModal()" class="mr-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">Annuler</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Enregistrer</button>
+<div id="editCategoryModal" class="hidden fixed inset-0 z-50 overflow-y-auto backdrop-blur-sm">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i class="fas fa-edit text-blue-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Modifier la Catégorie</h3>
+                        <div class="mt-4">
+                            <form id="editCategoryForm" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" id="editCategoryId" name="id">
+                                <input type="text" id="editCategoryName" name="name" placeholder="Nom de la catégorie" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <div class="mt-6 flex justify-end space-x-3">
+                                    <button type="button" onclick="closeEditCategoryModal()" 
+                                        class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        Annuler
+                                    </button>
+                                    <button type="submit" 
+                                        class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        Enregistrer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-
     function openAddCategoryModal() {
         document.getElementById('addCategoryModal').classList.remove('hidden');
     }
@@ -150,20 +239,34 @@
     }
 
     function confirmDeleteCategory(id) {
-        if (confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
-
-            fetch(`/admin/categories/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
-                }
-            }).then(response => {
-                if (response.ok) {
-                    window.location.reload();
-                }
-            });
-        }
+        Swal.fire({
+            title: 'Êtes-vous sûr?',
+            text: "Vous ne pourrez pas annuler cette action!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Oui, supprimer!',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/categories/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Content-Type': 'application/json'
+                    }
+                }).then(response => {
+                    if (response.ok) {
+                        Swal.fire(
+                            'Supprimé!',
+                            'La catégorie a été supprimée.',
+                            'success'
+                        ).then(() => window.location.reload());
+                    }
+                });
+            }
+        })
     }
 </script>
 @endsection

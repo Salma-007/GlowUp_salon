@@ -63,7 +63,7 @@
                 @endif
 
                 <!-- Profile Link - Ajouté ici -->
-                <a href="" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
+                <a href="{{ route('profile.edit') }}"  class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
                     <i class="fas fa-user-circle mr-3 text-gray-400 group-hover:text-gray-600"></i>
                     Mon profil
                 </a>
