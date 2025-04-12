@@ -3,7 +3,6 @@
 @section('content')
 <!-- Main content -->
 <div class="flex-1 flex flex-col overflow-hidden">
-    <!-- Top header -->
     <header class="bg-white shadow-md sticky top-0 z-10">
         <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
             <div class="flex items-center">
@@ -56,7 +55,6 @@
                 </div>
             </div>
 
-            <!-- Reservations List with Pagination -->
             <div class="mt-8 bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
                 <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Liste des Réservations</h3>
@@ -131,7 +129,6 @@
                                         '{{ $reservation->status }}',
                                         '{{ \Carbon\Carbon::parse($reservation->datetime)->format('d/m/Y') }}',
                                         '{{ \Carbon\Carbon::parse($reservation->datetime)->format('H:i') }}',
-                                        '{{ $reservation->notes ?? 'Aucune note' }}',
                                         '{{ $reservation->id }}'
                                     )" class="text-blue-600 hover:text-blue-900 mr-3">
                                         Voir
@@ -165,7 +162,6 @@
                     </table>
                 </div>
                 
-                <!-- Pagination -->
                 <div class="px-4 py-3 bg-gray-50 border-t border-gray-200 sm:px-6">
                     <div class="flex items-center justify-between">
                         <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
@@ -222,10 +218,7 @@
                                 <p class="text-sm font-medium text-gray-500">Heure</p>
                                 <p id="modalTime" class="mt-1 text-sm text-gray-900"></p>
                             </div>
-                            <div class="col-span-2">
-                                <p class="text-sm font-medium text-gray-500">Notes</p>
-                                <p id="modalNotes" class="mt-1 text-sm text-gray-900"></p>
-                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -276,10 +269,7 @@
                         </select>
                     </div>
                     
-                    <div class="mt-4">
-                        <label for="edit_notes" class="block text-sm font-medium text-gray-700">Notes</label>
-                        <textarea name="notes" id="edit_notes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
-                    </div>
+
                     
                     <div class="mt-6 flex justify-end">
                         <button type="button" onclick="closeEditModal()" class="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -301,7 +291,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-function openReservationModal(service, client, employee, status, date, time, notes, reservationId) {
+function openReservationModal(service, client, employee, status, date, time, reservationId) {
     document.getElementById('modalService').textContent = service;
     document.getElementById('modalClient').textContent = client;
     document.getElementById('modalEmployee').textContent = employee;
@@ -318,14 +308,25 @@ function openReservationModal(service, client, employee, status, date, time, not
     }
     
     if (status !== 'Done' && status !== 'Refused') {
-        const editButton = document.createElement('a');
-        editButton.id = 'modalEditButton';
-        editButton.href = '/admin/reservations/' + reservationId + '/edit';
-        editButton.className = 'w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm';
-        editButton.textContent = 'Modifier';
+        const editButton = document.createElement('button');
+    editButton.id = 'modalEditButton';
+    editButton.onclick = function() {
+        const [day, month, year] = date.split('/');
+        const formattedDate = `${year}-${month}-${day} ${time}:00`;
+        
+        openEditModal(
+            reservationId,
+            formattedDate,  
+            null,           
+            null            
+        );
+        closeReservationModal();
+    };
+    editButton.className = 'w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm';
+    editButton.textContent = 'Modifier';
 
-        const closeButton = document.querySelector('button[onclick="closeReservationModal()"]');
-        closeButton.insertAdjacentElement('beforebegin', editButton);
+    const closeButton = document.querySelector('button[onclick="closeReservationModal()"]');
+    closeButton.insertAdjacentElement('beforebegin', editButton);
     }
     
     switch(status) {
@@ -344,7 +345,7 @@ function openReservationModal(service, client, employee, status, date, time, not
     
     document.getElementById('modalDate').textContent = date;
     document.getElementById('modalTime').textContent = time;
-    document.getElementById('modalNotes').textContent = notes;
+
     
     document.getElementById('reservationModal').classList.remove('hidden');
 }
@@ -354,22 +355,32 @@ function closeReservationModal() {
 }
 
 function openEditModal(reservationId, datetime, employeeId, serviceId) {
-    // Afficher un indicateur de chargement
     Swal.fire({
         title: 'Chargement...',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
 
-    // Convertir la date au bon format
-    const dateObj = new Date(datetime);
-    const formattedDatetime = dateObj.toISOString().slice(0, 16);
+    let formattedDatetime = '';
+    if (datetime) {
+        const dateObj = new Date(datetime);
+        const year = dateObj.getFullYear();
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const hours = String(dateObj.getHours()).padStart(2, '0');
+        const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+        
+        formattedDatetime = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
     
     document.getElementById('reservation_id').value = reservationId;
-    document.getElementById('edit_service_id').value = serviceId;
-    document.getElementById('edit_datetime').value = formattedDatetime;
+    if (serviceId) {
+        document.getElementById('edit_service_id').value = serviceId;
+    }
+    if (formattedDatetime) {
+        document.getElementById('edit_datetime').value = formattedDatetime;
+    }
 
-    // Charger les données de la réservation et les employés
     fetch(`/admin/reservations/${reservationId}/edit-data`)
         .then(response => {
             if (!response.ok) throw new Error('Erreur réseau');
@@ -378,20 +389,27 @@ function openEditModal(reservationId, datetime, employeeId, serviceId) {
         .then(data => {
             Swal.close();
             
-            // Remplir le select des employés
             const select = document.getElementById('edit_employee_id');
             select.innerHTML = '';
             data.employees.forEach(employee => {
                 const option = new Option(employee.name, employee.id);
-                option.selected = (employee.id == employeeId);
+                option.selected = (employee.id == (employeeId || data.reservation.employee_id));
                 select.appendChild(option);
             });
             
-            // Pré-remplir les autres champs
             document.getElementById('edit_status').value = data.reservation.status;
-            document.getElementById('edit_notes').value = data.reservation.notes || '';
             
-            // Afficher le modal
+            if (!formattedDatetime) {
+                const dateObj = new Date(data.reservation.datetime);
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const hours = String(dateObj.getHours()).padStart(2, '0');
+                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                
+                document.getElementById('edit_datetime').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            }
+            
             document.getElementById('editReservationModal').classList.remove('hidden');
         })
         .catch(error => {
@@ -416,12 +434,11 @@ function showEditModalError(message) {
     errorDiv.classList.remove('hidden');
     errorMessage.textContent = message;
     
-    // Faire défiler jusqu'à l'erreur
     errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialiser le calendrier
+
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
@@ -450,7 +467,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     status: '{{ $reservation->status }}',
                     date: '{{ \Carbon\Carbon::parse($reservation->datetime)->format('d/m/Y') }}',
                     time: '{{ \Carbon\Carbon::parse($reservation->datetime)->format('H:i') }}',
-                    notes: '{{ $reservation->notes ?? 'Aucune note' }}',
                     reservationId: '{{ $reservation->id }}'
                 }
             },
@@ -464,14 +480,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 info.event.extendedProps.status,
                 info.event.extendedProps.date,
                 info.event.extendedProps.time,
-                info.event.extendedProps.notes,
                 info.event.extendedProps.reservationId
             );
         }
     });
     calendar.render();
 
-    // Gestion des clics en dehors des modals
     document.getElementById('reservationModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeReservationModal();
@@ -484,7 +498,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Gestion de la soumission du formulaire
     document.getElementById('editReservationForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -492,7 +505,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         const reservationId = formData.get('reservation_id');
 
-        // Afficher un indicateur de chargement
         const submitButton = form.querySelector('button[type="submit"]');
         const originalText = submitButton.textContent;
         submitButton.disabled = true;
@@ -539,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Afficher les messages flash
+
     @if(session('success'))
         Swal.fire({
             icon: 'success',

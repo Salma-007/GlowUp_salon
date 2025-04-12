@@ -20,7 +20,9 @@ class ReservationController extends Controller
     public function index()
     {
         try {
-            Reservation::where('end_time', '<', now())
+            $now = now()->timezone(config('app.timezone'));
+            
+            Reservation::where('end_time', '<', $now)
                 ->whereNotIn('status', ['Done', 'Refused'])
                 ->update(['status' => 'Done']);
 
@@ -29,19 +31,24 @@ class ReservationController extends Controller
                 ->paginate(6);
 
             $calendarReservations = Reservation::with(['client', 'employee', 'service'])
-            ->orderBy('datetime', 'asc')
-            ->get();
-    
+                ->orderBy('datetime', 'asc')
+                ->get()
+                ->map(function ($reservation) {
+                    $reservation->datetime = \Carbon\Carbon::parse($reservation->datetime)
+                        ->timezone(config('app.timezone'))
+                        ->format('Y-m-d H:i:s');
+                    return $reservation;
+                });
+        
             return view('admin.reservations.reservations-manage', [
                 'reservations' => $paginatedReservations,
                 'calendarReservations' => $calendarReservations
             ]);
-    
+        
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la récupération des réservations: ' . $e->getMessage());
         }
     }
-
     public function userReservations()
     {
         try {
