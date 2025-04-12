@@ -23,8 +23,6 @@
                 <div class="relative">
                     <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
                         <span class="sr-only">Ouvrir le menu utilisateur</span>
-                        <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
-                        <span class="sr-only">Ouvrir le menu utilisateur</span>
                         <div class="flex items-center">
                         @if(Auth::user()->photo)
                             <img class="h-8 w-8 rounded-full object-cover" 
@@ -37,7 +35,6 @@
                         @endif
                             <span class="hidden md:block ml-2 text-gray-700">{{ Auth::user()->name }}</span>
                         </div>
-                    </button>
                     </button>
                 </div>
             </div>
@@ -141,8 +138,12 @@
                                     </button>
                                     
                                     @if($reservation->status !== 'Done' && $reservation->status !== 'Refused')
-                                        <button onclick="openEditModal({{ $reservation->id }}, '{{ $reservation->datetime }}', {{ $reservation->employee_id }}, {{ $reservation->service_id }})" 
-                                            class="text-indigo-600 hover:text-indigo-900 mr-3">
+                                        <button onclick="openEditModal(
+                                            {{ $reservation->id }}, 
+                                            '{{ $reservation->datetime }}', 
+                                            {{ $reservation->employee_id }}, 
+                                            {{ $reservation->service_id }}
+                                        )" class="text-indigo-600 hover:text-indigo-900 mr-3">
                                             Modifier
                                         </button>
                                         <form action="" method="POST" class="inline">
@@ -245,6 +246,9 @@
         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <h3 class="text-lg font-medium leading-6 text-gray-900">Modifier la réservation</h3>
+                <div id="editModalError" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
+                    <p id="editModalErrorMessage"></p>
+                </div>
                 <form id="editReservationForm" method="POST">
                     @csrf
                     @method('PUT')
@@ -350,59 +354,74 @@ function closeReservationModal() {
 }
 
 function openEditModal(reservationId, datetime, employeeId, serviceId) {
-    console.log('Opening edit modal for:', reservationId);
-
+    // Afficher un indicateur de chargement
     Swal.fire({
         title: 'Chargement...',
         allowOutsideClick: false,
         didOpen: () => Swal.showLoading()
     });
 
-    fetch(`/admin/reservations/${reservationId}/edit-data`, {
-        headers: {
-            'Accept': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Erreur réseau');
-        return response.json();
-    })
-    .then(data => {
-        Swal.close();
-        console.log('Data received:', data);
+    // Convertir la date au bon format
+    const dateObj = new Date(datetime);
+    const formattedDatetime = dateObj.toISOString().slice(0, 16);
+    
+    document.getElementById('reservation_id').value = reservationId;
+    document.getElementById('edit_service_id').value = serviceId;
+    document.getElementById('edit_datetime').value = formattedDatetime;
 
-        document.getElementById('reservation_id').value = reservationId;
-        document.getElementById('edit_datetime').value = datetime;
-        document.getElementById('edit_service_id').value = serviceId;
-        document.getElementById('edit_status').value = data.reservation.status;
-        document.getElementById('edit_notes').value = data.reservation.notes;
-
-        const select = document.getElementById('edit_employee_id');
-        select.innerHTML = '';
-        data.employees.forEach(emp => {
-            const option = new Option(emp.name, emp.id);
-            option.selected = emp.id == employeeId;
-            select.add(option);
+    // Charger les données de la réservation et les employés
+    fetch(`/admin/reservations/${reservationId}/edit-data`)
+        .then(response => {
+            if (!response.ok) throw new Error('Erreur réseau');
+            return response.json();
+        })
+        .then(data => {
+            Swal.close();
+            
+            // Remplir le select des employés
+            const select = document.getElementById('edit_employee_id');
+            select.innerHTML = '';
+            data.employees.forEach(employee => {
+                const option = new Option(employee.name, employee.id);
+                option.selected = (employee.id == employeeId);
+                select.appendChild(option);
+            });
+            
+            // Pré-remplir les autres champs
+            document.getElementById('edit_status').value = data.reservation.status;
+            document.getElementById('edit_notes').value = data.reservation.notes || '';
+            
+            // Afficher le modal
+            document.getElementById('editReservationModal').classList.remove('hidden');
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Impossible de charger les données de la réservation'
+            });
+            console.error('Error:', error);
         });
-
-        document.getElementById('editReservationModal').classList.remove('hidden');
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erreur',
-            text: 'Échec du chargement: ' + error.message
-        });
-    });
 }
 
 function closeEditModal() {
     document.getElementById('editReservationModal').classList.add('hidden');
+    document.getElementById('editModalError').classList.add('hidden');
+}
+
+function showEditModalError(message) {
+    const errorDiv = document.getElementById('editModalError');
+    const errorMessage = document.getElementById('editModalErrorMessage');
+    
+    errorDiv.classList.remove('hidden');
+    errorMessage.textContent = message;
+    
+    // Faire défiler jusqu'à l'erreur
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialiser le calendrier
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
@@ -413,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function() {
             right: 'dayGridMonth,timeGridWeek,timeGridDay'
         },
         events: [
-            @foreach($reservations as $reservation)
+            @foreach($calendarReservations as $reservation)
             {
                 title: '{{ $reservation->service->name }} - {{ $reservation->client->name }}',
                 start: '{{ $reservation->datetime }}',
@@ -452,6 +471,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     calendar.render();
 
+    // Gestion des clics en dehors des modals
     document.getElementById('reservationModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeReservationModal();
@@ -464,6 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Gestion de la soumission du formulaire
     document.getElementById('editReservationForm').addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -471,7 +492,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         const reservationId = formData.get('reservation_id');
 
-        fetch(`/reservations/${reservationId}`, {
+        // Afficher un indicateur de chargement
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Enregistrement...';
+
+        fetch(`/admin/reservations/${reservationId}`, {
             method: 'POST',
             body: formData,
             headers: {
@@ -483,12 +510,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => {
             if (!response.ok) {
                 return response.json().then(err => {
-                    
+                    let errorMessage = err.error || 'Une erreur est survenue';
                     if (err.errors) {
-                        const firstError = Object.values(err.errors)[0][0];
-                        return Promise.reject(firstError);
+                        errorMessage = Object.values(err.errors).flat().join('\n');
                     }
-                    return Promise.reject(err.error || 'Une erreur est survenue');
+                    throw new Error(errorMessage);
                 });
             }
             return response.json();
@@ -497,24 +523,23 @@ document.addEventListener('DOMContentLoaded', function() {
             Swal.fire({
                 icon: 'success',
                 title: 'Succès',
-                text: data.message,
-                willClose: () => {
-                    window.location.reload();
-                }
+                text: data.success || 'La réservation a été mise à jour avec succès',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.reload();
             });
         })
         .catch(error => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erreur',
-                text: typeof error === 'string' ? error : error.message || 'Une erreur est survenue',
-                didDestroy: () => {
-                    document.getElementById('editReservationModal').classList.remove('hidden');
-                }
-            });
+            showEditModalError(error.message);
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
         });
     });
     
+    // Afficher les messages flash
     @if(session('success'))
         Swal.fire({
             icon: 'success',

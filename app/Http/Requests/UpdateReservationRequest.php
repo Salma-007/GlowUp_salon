@@ -36,7 +36,6 @@ class UpdateReservationRequest extends FormRequest
                     }
                 },
             ],
-            'status' => 'nullable|in:pending,confirmed,cancelled,completed',
             'end_time' => 'nullable|date|after:datetime', 
         ];
     }
@@ -49,7 +48,6 @@ class UpdateReservationRequest extends FormRequest
             'datetime.required' => 'La date et heure de réservation sont obligatoires.',
             'datetime.date' => 'Le format de la date et heure est invalide.',
             'datetime.after_or_equal' => 'La réservation doit être programmée au moins 2 heures à l\'avance.',
-            'status.in' => 'Le statut doit être parmi : pending, confirmed, cancelled ou completed.',
             'end_time.date' => 'L\'heure de fin doit être une date valide.',
             'end_time.after' => 'L\'heure de fin doit être postérieure à l\'heure de début.',
         ];

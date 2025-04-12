@@ -25,9 +25,12 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/admin/reservations/{reservation}/edit-data', [ReservationController::class, 'editData'])
     ->name('admin.reservations.edit-data');
-    Route::put('/admin/reservations/{reservation}', [ReservationController::class, 'update'])
+    // Route::put('/admin/reservations/{reservation}', [ReservationController::class, 'update'])
+    // ->name('admin.reservations.update');
+    Route::put('admin/reservations/{reservation}', [ReservationController::class, 'adminUpdate'])
     ->name('admin.reservations.update');
-    
+
+
     Route::get('/reservations/add', [ReservationController::class, 'create'])->name("reservation-ajout")->middleware('role:client');
     Route::post('/reservations/ajout', [ReservationController::class, 'store'])->name("new_reservation")->middleware('role:client');
     Route::get('/mes-reservations', [ReservationController::class, 'clientReservations'])->name('client.reservations')->middleware('role:client');
