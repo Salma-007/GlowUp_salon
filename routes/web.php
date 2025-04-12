@@ -96,13 +96,19 @@ Route::middleware(['auth', 'admin'])->group(function () {
     
 });
 
-// update profil
+// update profil client
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/photo', [ProfileController::class, 'updatePhoto'])->name('profile.update-photo');
 });
 
+// update profil employé
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/dashboard/profile', [ProfileController::class, 'updateEmployee'])->name('profile.update');
+    Route::put('/dashboard/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+});
 
 
 // manage authentication

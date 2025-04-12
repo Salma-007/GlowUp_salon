@@ -16,9 +16,15 @@ class ServiceController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Service::with('category');
-            
+            $query = Service::with(['category', 'reservations' => function($query) {
 
+                $query->whereMonth('datetime', now()->month)
+                      ->whereYear('datetime', now()->year);
+            }])->withCount(['reservations' => function($query) {
+                $query->whereMonth('datetime', now()->month)
+                      ->whereYear('datetime', now()->year);
+            }]);
+            
             if ($request->has('category')) {
                 $query->where('category_id', $request->category);
             }
@@ -36,12 +42,16 @@ class ServiceController extends Controller
     public function search(Request $request)
     {
         $output = "";
-        $services = Service::with('category')
-            ->where(function($query) use ($request) {
-                $query->where('name', 'like', '%'.$request->search.'%')
-                    ->orWhere('description', 'like', '%'.$request->search.'%');
-            })
-            ->get();
+        $services = Service::with(['category'])
+        ->withCount(['reservations' => function($query) {
+            $query->whereMonth('datetime', now()->month)
+                  ->whereYear('datetime', now()->year);
+        }])
+        ->where(function($query) use ($request) {
+            $query->where('name', 'like', '%'.$request->search.'%')
+                ->orWhere('description', 'like', '%'.$request->search.'%');
+        })
+        ->get();
 
         foreach($services as $service)
         {
@@ -71,7 +81,7 @@ class ServiceController extends Controller
                                 <div class="text-sm text-gray-900">'.number_format($service->price, 2).'€</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                '.($service->reservations_count ?? 0).' ce mois
+                                '.$service->reservations_count.' ce mois
                             </td>';
 
             if(auth()->user()->hasRole('admin')) {
