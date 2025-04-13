@@ -31,14 +31,24 @@ class EmployeeController extends Controller
 
         foreach($employees as $employee)
         {
+
+            $photoHtml = '<div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+            <i class="fas fa-user"></i>
+            </div>';
+    
+            if ($employee->photo) {
+            $photoPath = asset('storage/' . $employee->photo);
+            $photoHtml = '<div class="flex-shrink-0 h-10 w-10">
+               <img class="h-10 w-10 rounded-full object-cover" src="'.$photoPath.'" alt="Photo de '.$employee->name.'">
+            </div>';
+            }
+
             $roles = implode(', ', $employee->roles->pluck('name')->toArray());
 
             $output.= '<tr class="hover:bg-gray-50 transition duration-300">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
-                                        <i class="fas fa-user"></i>
-                                    </div>
+                                    '.$photoHtml.'
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900">' . $employee->name . '</div>
                                         <div class="text-sm text-gray-500">Employé depuis ' . $employee->created_at->format('Y') . '</div>
