@@ -21,7 +21,7 @@ class StoreReservationRequest extends FormRequest
             'datetime' => [
                 'required',
                 'date',
-                'after_or_equal:' . now()->addHours(2)->toDateTimeString(), 
+                // 'after_or_equal:' . now()->addHours(2)->toDateTimeString(), 
                 function ($attribute, $value, $fail) {
                     $datetime = Carbon::parse($value);
                     $startTime = $datetime->copy()->setTime(9, 0, 0);

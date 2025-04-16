@@ -12,6 +12,7 @@
                 </button>
                 <h1 class="ml-2 md:ml-0 text-xl font-bold text-gray-800">Calendrier des Réservations</h1>
             </div>
+            
             <div class="flex items-center gap-4">
                 <div class="relative">
                     <button class="text-gray-500 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors">
@@ -43,13 +44,17 @@
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gray-50">
         <div class="max-w-7xl mx-auto">
             <!-- Calendar -->
-            <div class="bg-white shadow-md rounded-xl overflow-hidden border border-gray-100">
-                <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
+                <div>
                     <h3 class="text-lg leading-6 font-medium text-gray-900">Calendrier des Réservations</h3>
                     <p class="mt-1 max-w-2xl text-sm text-gray-500">
                         Visualisez et gérez les réservations (Total: {{ $reservations->total() }})
                     </p>
                 </div>
+                <button onclick="openCreateModal()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <i class="fas fa-plus mr-2"></i> Nouvelle Réservation
+                </button>
+            </div>
                 <div class="p-6">
                     <div id="calendar"></div>
                 </div>
@@ -181,6 +186,76 @@
             </div>
         </div>
     </main>
+</div>
+
+<!-- Create Reservation Modal -->
+<div id="createReservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm" aria-hidden="true"></div>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 class="text-lg font-medium leading-6 text-gray-900">Créer une nouvelle réservation</h3>
+                <div id="createModalError" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mb-4 rounded">
+                    <p id="createModalErrorMessage"></p>
+                </div>
+                <form id="createReservationForm" method="POST" action="{{ route('admin.reservations.store') }}">
+                    @csrf
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label for="client_id" class="block text-sm font-medium text-gray-700">Client</label>
+                            <select name="client_id" id="client_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                <option value="">Sélectionner un client</option>
+                                @foreach($clients as $client)
+                                    <option value="{{ $client->id }}">{{ $client->name }} ({{ $client->email }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="service_id" class="block text-sm font-medium text-gray-700">Service</label>
+                            <select name="service_id" id="service_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                <option value="">Sélectionner un service</option>
+                                @foreach($services as $service)
+                                    <option value="{{ $service->id }}" data-duration="{{ $service->duration }}">{{ $service->name }} ({{ $service->duration }} min)</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="employee_id" class="block text-sm font-medium text-gray-700">Employé</label>
+                            <select name="employee_id" id="employee_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                                <option value="">Sélectionner un employé</option>
+                                <!-- Rempli dynamiquement via JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label for="create_datetime" class="block text-sm font-medium text-gray-700">Date et heure</label>
+                            <input type="datetime-local" name="datetime" id="create_datetime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                        </div>
+                        
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700">Statut</label>
+                            <select name="status" id="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                <option value="Pending">En attente</option>
+                                <option value="Done">Confirmé</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" onclick="closeCreateModal()" class="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Annuler
+                        </button>
+                        <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Créer la réservation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Reservation Details Modal -->
@@ -570,5 +645,103 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     @endif
 });
+
+// add reservation
+function openCreateModal() {
+    document.getElementById('createReservationModal').classList.remove('hidden');
+}
+
+function closeCreateModal() {
+    document.getElementById('createReservationModal').classList.add('hidden');
+    document.getElementById('createModalError').classList.add('hidden');
+}
+
+function showCreateModalError(message) {
+    const errorDiv = document.getElementById('createModalError');
+    const errorMessage = document.getElementById('createModalErrorMessage');
+    
+    errorDiv.classList.remove('hidden');
+    errorMessage.textContent = message;
+    
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Gestion du changement de service pour charger les employés
+document.getElementById('service_id').addEventListener('change', function() {
+    const serviceId = this.value;
+    const employeeSelect = document.getElementById('employee_id');
+    
+    if (!serviceId) {
+        employeeSelect.innerHTML = '<option value="">Sélectionner un employé</option>';
+        return;
+    }
+    
+    fetch(`/services/${serviceId}/employees`)
+        .then(response => response.json())
+        .then(data => {
+            employeeSelect.innerHTML = '<option value="">Sélectionner un employé</option>';
+            data.forEach(employee => {
+                const option = new Option(employee.name, employee.id);
+                employeeSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            employeeSelect.innerHTML = '<option value="">Erreur de chargement</option>';
+        });
+});
+
+// Gestion de la soumission du formulaire
+document.getElementById('createReservationForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Création...';
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => {
+                let errorMessage = err.message || 'Une erreur est survenue';
+                if (err.errors) {
+                    errorMessage = Object.values(err.errors).flat().join('\n');
+                }
+                throw new Error(errorMessage);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        Swal.fire({
+            icon: 'success',
+            title: 'Succès',
+            text: data.success || 'La réservation a été créée avec succès',
+            timer: 2000,
+            showConfirmButton: false
+        }).then(() => {
+            window.location.reload();
+        });
+    })
+    .catch(error => {
+        showCreateModalError(error.message);
+    })
+    .finally(() => {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    });
+});
+
 </script>
 @endsection

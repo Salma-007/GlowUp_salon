@@ -39,10 +39,18 @@ class ReservationController extends Controller
                         ->format('Y-m-d H:i:s');
                     return $reservation;
                 });
+
+                $services = Service::all();
+
+                $clients = User::whereHas('roles', function($query) {
+                    $query->where('name', 'client');
+                })->get();
         
             return view('admin.reservations.reservations-manage', [
                 'reservations' => $paginatedReservations,
-                'calendarReservations' => $calendarReservations
+                'calendarReservations' => $calendarReservations,
+                'clients' => $clients,
+                'services' => $services
             ]);
         
         } catch (Exception $e) {
@@ -308,6 +316,145 @@ class ReservationController extends Controller
             return response()->json([
                 'error' => 'Une erreur est survenue: ' . $e->getMessage()
             ], 500);
+        }
+    }
+
+    public function adminStore(StoreReservationRequest $request)
+    {
+        try {
+            $client = User::findOrFail($request->client_id);
+            $service = Service::findOrFail($request->service_id);
+
+            $startTime = new DateTime($request->datetime);
+            $endTime = clone $startTime;
+            $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
+
+            $isEmployeeAvailable = !Reservation::where('employee_id', $request->employee_id)
+                ->where(function($query) use ($startTime, $endTime) {
+                    $query->whereBetween('datetime', [$startTime, $endTime])
+                        ->orWhereBetween('end_time', [$startTime, $endTime])
+                        ->orWhere(function($q) use ($startTime, $endTime) {
+                            $q->where('datetime', '<', $startTime)
+                                ->where('end_time', '>', $endTime);
+                        });
+                })
+                ->whereNotIn('status', ['Refused'])
+                ->exists();
+
+            if (!$isEmployeeAvailable) {
+                return response()->json([
+                    'message' => 'Employee not available',
+                    'errors' => ['datetime' => ['L\'employé est indisponible à cette heure. Veuillez choisir un autre créneau.']]
+                ], 422);
+            }
+
+            $reservation = Reservation::create([
+                'client_id' => $client->id,
+                'employee_id' => $request->employee_id,
+                'service_id' => $service->id,
+                'datetime' => $request->datetime,
+                'end_time' => $endTime->format('Y-m-d H:i:s'),
+                'status' => $request->status ?? 'Pending',
+            ]);
+
+            event(new ReservationCreated($reservation));
+
+            return response()->json([
+                'success' => 'Réservation créée avec succès'
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Une erreur est survenue: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function checkAvailability(Request $request)
+    {
+        $request->validate([
+            'employee_id' => 'required|exists:users,id',
+            'date' => 'required|date_format:Y-m-d',
+            'service_id' => 'required|exists:services,id'
+        ]);
+
+        try {
+            $employeeId = $request->employee_id;
+            $date = $request->date;
+            $service = Service::findOrFail($request->service_id);
+            
+
+            $startHour = 9; 
+            $endHour = 16;   
+
+            $availableSlots = [];
+            
+            for ($hour = $startHour; $hour < $endHour; $hour++) {
+                for ($minute = 0; $minute < 60; $minute += 30) {
+                    $startTime = new DateTime("$date $hour:$minute:00");
+                    $endTime = clone $startTime;
+                    $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
+                    
+                    $isAvailable = !Reservation::where('employee_id', $employeeId)
+                        ->where(function($query) use ($startTime, $endTime) {
+                            $query->whereBetween('datetime', [$startTime, $endTime])
+                                ->orWhereBetween('end_time', [$startTime, $endTime])
+                                ->orWhere(function($q) use ($startTime, $endTime) {
+                                    $q->where('datetime', '<', $startTime)
+                                        ->where('end_time', '>', $endTime);
+                                });
+                        })
+                        ->whereNotIn('status', ['Refused', 'Done'])
+                        ->exists();
+                    
+                    if ($isAvailable) {
+                        $availableSlots[] = sprintf('%02d:%02d', $hour, $minute);
+                    }
+                }
+            }
+            
+            return response()->json([
+                'available_slots' => $availableSlots,
+                'message' => count($availableSlots) ? null : 'Aucun créneau disponible'
+            ]);
+            
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => 'Une erreur est survenue: ' . $e->getMessage(),
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function calendar(Request $request)
+    {
+        $employeeId = $request->input('employee_id');
+        
+        $reservations = Reservation::with(['client', 'employee', 'service'])
+            ->when($employeeId, function($query) use ($employeeId) {
+                return $query->where('employee_id', $employeeId);
+            })
+            ->orderBy('datetime', 'asc')
+            ->get()
+            ->map(function ($reservation) {
+                return [
+                    'title' => $reservation->service->name . ' (' . $reservation->client->name . ')',
+                    'start' => $reservation->datetime,
+                    'end' => $reservation->end_time,
+                    'color' => $this->getStatusColor($reservation->status),
+                ];
+            });
+
+        return response()->json($reservations);
+    }
+
+    private function getStatusColor($status)
+    {
+        switch ($status) {
+            case 'Pending': return '#FFC107'; 
+            case 'Refused': return '#DC3545'; 
+            case 'Done': return '#28A745'; 
+            default: return '#007BFF'; 
         }
     }
 
