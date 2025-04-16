@@ -21,7 +21,7 @@ class StoreReservationRequest extends FormRequest
             'datetime' => [
                 'required',
                 'date',
-                // 'after_or_equal:' . now()->addHours(2)->toDateTimeString(), 
+                'after_or_equal:now', 
                 function ($attribute, $value, $fail) {
                     $datetime = Carbon::parse($value);
                     $startTime = $datetime->copy()->setTime(9, 0, 0);
@@ -44,7 +44,7 @@ class StoreReservationRequest extends FormRequest
             'service_id.exists' => 'Le service sélectionné est invalide.',
             'datetime.required' => 'La date et l\'heure sont obligatoires.',
             'datetime.date' => 'La date et l\'heure doivent être une date valide.',
-            'datetime.after_or_equal' => 'La date et l\'heure doivent être au moins 2 heures après l\'heure actuelle.',
+            'datetime.after_or_equal' => 'La date et l\'heure doivent être après l\'heure actuelle.',
         ];
     }
 }

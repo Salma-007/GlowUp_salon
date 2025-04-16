@@ -146,8 +146,12 @@ class ReservationController extends Controller
 
             event(new ReservationCreated($reservation));
             
-            return redirect()->back()->with('success', 'Réservation créée avec succès.');
-            
+            // return redirect()->back()->with('success', 'Réservation créée avec succès.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Réservation créée avec succès'
+            ]);
+
         } catch (Exception $e) {
 
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la création de la réservation.' . $e->getMessage());

@@ -81,7 +81,6 @@
                 </div>
             </div>
 
-            <!-- Step 1: Employee Selection -->
             <div id="step1Content" class="mt-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <!-- Employee cards will be inserted here by JavaScript -->
@@ -98,7 +97,6 @@
                 </div>
             </div>
 
-            <!-- Step 2: Calendar and Time Selection -->
             <div id="step2Content" class="hidden mt-4">
                 <div class="mb-4">
                     <div id="calendar" class="mb-4"></div>
@@ -221,20 +219,17 @@
     function goToStep2() {
         if (!selectedEmployeeId) return;
         
-        // Update step indicators
         document.getElementById('step2').querySelector('div:first-child').classList.add('bg-pink-600', 'text-white');
         document.getElementById('step2').querySelector('div:first-child').classList.remove('bg-gray-300', 'text-gray-600');
         document.getElementById('step2').querySelector('div:last-child').classList.add('text-pink-600');
         document.getElementById('step2').querySelector('div:last-child').classList.remove('text-gray-500');
         
-        // Hide step 1, show step 2
         document.getElementById('step1Content').classList.add('hidden');
         document.getElementById('step2Content').classList.remove('hidden');
         
-        // Initialize calendar if not already done
         const calendarEl = document.getElementById('calendar');
         if (calendarEl) {
-            calendarEl.innerHTML = ''; // Clear previous calendar
+            calendarEl.innerHTML = ''; 
             
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
@@ -255,10 +250,20 @@
                     }
                 },
                 dateClick: function(info) {
+                    const clickedDate = new Date(info.dateStr);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); 
+                    
+                    if (clickedDate < today) {
+                        showModalError('Vous ne pouvez pas réserver une date passée');
+                        document.getElementById('timeSlots').innerHTML = '';
+                        return;
+                    }
+                    
                     selectedDate = info.dateStr;
                     loadAvailableTimeSlots(info.dateStr);
                 },
-                eventTimeFormat: { // Format d'affichage des heures
+                eventTimeFormat: { 
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: false
@@ -270,106 +275,116 @@
     }
 
     function goToStep1() {
-        // Update step indicators
+        
         document.getElementById('step2').querySelector('div:first-child').classList.remove('bg-pink-600', 'text-white');
         document.getElementById('step2').querySelector('div:first-child').classList.add('bg-gray-300', 'text-gray-600');
         document.getElementById('step2').querySelector('div:last-child').classList.remove('text-pink-600');
         document.getElementById('step2').querySelector('div:last-child').classList.add('text-gray-500');
         
-        // Hide step 2, show step 1
         document.getElementById('step2Content').classList.add('hidden');
         document.getElementById('step1Content').classList.remove('hidden');
         
-        // Reset time selection
         selectedDate = null;
         selectedTime = null;
         document.getElementById('timeSlots').innerHTML = '';
     }
 
     function loadAvailableTimeSlots(date) {
-    if (!selectedEmployeeId || !selectedServiceId) {
-        console.error('Missing required parameters');
-        return;
-    }
 
-    console.log('Fetching slots for:', {selectedEmployeeId, date, selectedServiceId});
-
-    fetch(`/api/availability?${new URLSearchParams({
-        employee_id: selectedEmployeeId,
-        date: date,
-        service_id: selectedServiceId
-    })}`, {
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(async response => {
-        const contentType = response.headers.get('content-type');
+        const selectedDateObj = new Date(date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         
-        // Vérifiez si la réponse est JSON
-        if (!contentType || !contentType.includes('application/json')) {
-            const text = await response.text();
-            console.error('Expected JSON but got:', text);
-            throw new Error('Le serveur a retourné une réponse non-JSON');
+        if (selectedDateObj < today) {
+            document.getElementById('timeSlots').innerHTML = `
+                <p class="col-span-4 text-red-500 py-4">
+                    Date passée - veuillez choisir une date future
+                </p>`;
+            return;
         }
 
-        if (!response.ok) {
-            const err = await response.json();
-            throw new Error(err.message || 'Erreur serveur');
+        if (!selectedEmployeeId || !selectedServiceId) {
+            console.error('Missing required parameters');
+            return;
         }
-        
-        return response.json();
-    })
-    .then(data => {
-        console.log('Received data:', data);
-        const timeSlotsContainer = document.getElementById('timeSlots');
-        timeSlotsContainer.innerHTML = '';
-        
-        if (data.available_slots?.length > 0) {
-            data.available_slots.forEach(slot => {
-                const timeBtn = document.createElement('button');
-                timeBtn.type = 'button';
-                timeBtn.className = 'px-3 py-2 border rounded-md text-sm font-medium hover:bg-pink-100 transition-colors';
-                timeBtn.textContent = slot;
-                
-                timeBtn.addEventListener('click', function() {
-                    document.querySelectorAll('#timeSlots button').forEach(btn => {
-                        btn.classList.remove('bg-pink-600', 'text-white', 'border-pink-600');
-                        btn.classList.add('border-gray-300');
+
+        console.log('Fetching slots for:', {selectedEmployeeId, date, selectedServiceId});
+
+        fetch(`/api/availability?${new URLSearchParams({
+            employee_id: selectedEmployeeId,
+            date: date,
+            service_id: selectedServiceId
+        })}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(async response => {
+            const contentType = response.headers.get('content-type');
+            
+            if (!contentType || !contentType.includes('application/json')) {
+                const text = await response.text();
+                console.error('Expected JSON but got:', text);
+                throw new Error('Le serveur a retourné une réponse non-JSON');
+            }
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.message || 'Erreur serveur');
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('Received data:', data);
+            const timeSlotsContainer = document.getElementById('timeSlots');
+            timeSlotsContainer.innerHTML = '';
+            
+            if (data.available_slots?.length > 0) {
+                data.available_slots.forEach(slot => {
+                    const timeBtn = document.createElement('button');
+                    timeBtn.type = 'button';
+                    timeBtn.className = 'px-3 py-2 border rounded-md text-sm font-medium hover:bg-pink-100 transition-colors';
+                    timeBtn.textContent = slot;
+                    
+                    timeBtn.addEventListener('click', function() {
+                        document.querySelectorAll('#timeSlots button').forEach(btn => {
+                            btn.classList.remove('bg-pink-600', 'text-white', 'border-pink-600');
+                            btn.classList.add('border-gray-300');
+                        });
+                        
+                        this.classList.add('bg-pink-600', 'text-white', 'border-pink-600');
+                        this.classList.remove('border-gray-300');
+                        
+                        selectedTime = slot;
+                        console.log('Selected time:', selectedTime);
                     });
                     
-                    this.classList.add('bg-pink-600', 'text-white', 'border-pink-600');
-                    this.classList.remove('border-gray-300');
-                    
-                    selectedTime = slot;
-                    console.log('Selected time:', selectedTime);
+                    timeSlotsContainer.appendChild(timeBtn);
                 });
-                
-                timeSlotsContainer.appendChild(timeBtn);
-            });
-        } else {
+            } else {
+                timeSlotsContainer.innerHTML = `
+                    <p class="col-span-4 text-gray-500 py-4">
+                        Aucun créneau disponible pour cette date.
+                        ${data.message ? `<br>${data.message}` : ''}
+                    </p>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Full error:', error);
+            const timeSlotsContainer = document.getElementById('timeSlots');
             timeSlotsContainer.innerHTML = `
-                <p class="col-span-4 text-gray-500 py-4">
-                    Aucun créneau disponible pour cette date.
-                    ${data.message ? `<br>${data.message}` : ''}
+                <p class="col-span-4 text-red-500 py-4">
+                    Erreur lors du chargement des créneaux.<br>
+                    ${error.message}
                 </p>
             `;
-        }
-    })
-    .catch(error => {
-        console.error('Full error:', error);
-        const timeSlotsContainer = document.getElementById('timeSlots');
-        timeSlotsContainer.innerHTML = `
-            <p class="col-span-4 text-red-500 py-4">
-                Erreur lors du chargement des créneaux.<br>
-                ${error.message}
-            </p>
-        `;
-    });
+        });
 }
 
-    function confirmReservation() {
+function confirmReservation() {
     if (!selectedServiceId || !selectedEmployeeId || !selectedDate || !selectedTime) {
         showModalError('Veuillez sélectionner un créneau horaire.');
         return;
@@ -388,11 +403,9 @@
         cancelButtonText: 'Annuler'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Afficher un loader
             Swal.showLoading();
             
-            // Submit the reservation
-            fetch('{{ route("new_reservation") }}', {
+            fetch('{{ route("new_reservation") }}', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -402,39 +415,40 @@
                 body: JSON.stringify({
                     service_id: selectedServiceId,
                     employee_id: selectedEmployeeId,
-                    datetime: datetime
+                    datetime: datetime,
+                    status: 'pending',
+                    _method: 'POST'
                 })
             })
-            .then(async response => {
-                const data = await response.json();
+            .then(response => {
                 if (!response.ok) {
-                    throw new Error(data.error || 'Erreur inconnue');
+                    return response.text().then(text => {
+                        throw new Error(text || 'Erreur serveur');
+                    });
                 }
-                return data;
+                return response.json();
             })
             .then(data => {
                 Swal.fire({
                     icon: 'success',
                     title: 'Succès',
-                    text: 'Votre réservation a été enregistrée avec succès!',
-                    timer: 3000,
-                    showConfirmButton: false
-                }).then(() => {
-                    closeModal();
-                    window.location.reload();
+                    text: 'Réservation confirmée!',
+                    timer: 3000
                 });
+                closeModal();
             })
             .catch(error => {
+                console.error('Error:', error);
                 Swal.fire({
                     icon: 'error',
                     title: 'Erreur',
-                    text: error.message || 'Une erreur est survenue lors de la réservation.'
+                    text: error.message || 'Erreur lors de la réservation'
                 });
-                console.error('Error:', error);
             });
         }
     });
 }
+
     function showModalError(message) {
         const errorDiv = document.getElementById('modalError');
         const errorMessage = document.getElementById('modalErrorMessage');
