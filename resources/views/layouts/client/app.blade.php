@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Flatpickr pour le calendrier -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+    <style>
+    html {
+        scroll-behavior: smooth;
+    }
+</style>
     @yield('styles')
 </head>
 <body class="bg-gray-50 font-sans">
@@ -25,7 +30,7 @@
                         @auth
                             <a href="{{route('client.reservations')}}" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Mes Réservation</a>
                         @endauth
-                        <a href="" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact</a>
+                        <a href="#contact-section" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact</a>
                     </nav>
                 </div>
                 <div class="hidden sm:ml-6 sm:flex sm:items-center">
@@ -147,11 +152,11 @@
                         <li><a href="{{ route('home') }}" class="text-gray-300 hover:text-pink-400">Accueil</a></li>
                         <li><a href="{{ route('services') }}" class="text-gray-300 hover:text-pink-400">Services</a></li>
                         <li><a href="" class="text-gray-300 hover:text-pink-400">Réservation</a></li>
-                        <li><a href="" class="text-gray-300 hover:text-pink-400">Contact</a></li>
+                        <li><a href="#contact-section" class="text-gray-300 hover:text-pink-400">Contact</a></li>
                     </ul>
                 </div>
                 <div>
-                    <h3 class="text-lg font-semibold text-white mb-4">Contact</h3>
+                    <h3 id="contact-section" class="text-lg font-semibold text-white mb-4">Contact</h3>
                     <ul class="space-y-2 text-gray-300">
                         <li class="flex items-start">
                             <i class="fas fa-map-marker-alt mt-1 mr-2 text-pink-400"></i>

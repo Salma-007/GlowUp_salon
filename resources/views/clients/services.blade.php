@@ -3,9 +3,9 @@
 @section('title', 'Réserver un service')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 ">
 
-    <div class="mb-6 flex items-center justify-between bg-white p-3 rounded-lg shadow-md">
+    <div class="mb-6 flex items-center justify-between bg-white p-3 rounded-lg shadow-md ">
         <h1 class="text-2xl font-bold text-gray-900">Tous nos Services</h1>
         <form method="GET" action="{{ route('services') }}" class="flex items-center gap-3">
             <select name="category_id" onchange="this.form.submit()" 
