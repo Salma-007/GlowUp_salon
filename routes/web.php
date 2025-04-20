@@ -37,9 +37,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update')->middleware('role:client');
     Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy')->middleware('role:client');
     Route::get('/admin/reservations', [ReservationController::class, 'index'])->name('admin.reservations');
+    Route::post('/admin/reservations', [ReservationController::class, 'adminStore'])->name('admin.reservations.store');
     Route::get('/employee/planning', [ReservationController::class, 'userReservations'])->name('employee.reservations');
     Route::get('/services/{service}/employees', [ReservationController::class, 'getEmployeesByService'])
      ->name('services.employees');
+    Route::get('/availability', [ReservationController::class, 'checkAvailability']);
+    Route::get('/reservations/calendar', [ReservationController::class, 'calendar']);
 
      //manage employees
     Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin.employees.add')->middleware('role:admin');

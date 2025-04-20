@@ -34,7 +34,6 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Détails</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date/Heure</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durée</th>
@@ -45,13 +44,7 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     @forelse($reservations as $reservation)
                     <tr>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            @if($reservation->client_id == $user->id)
-                                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">Réservation</span>
-                            @else
-                                <span class="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">Prestation</span>
-                            @endif
-                        </td>
+
                         <td class="px-6 py-4">
                             <div class="text-sm font-medium text-gray-900">
                                 @if($reservation->client_id == $user->id)
@@ -72,19 +65,19 @@
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
-                            @switch($reservation->status)
-                                @case('pending')
-                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">En attente</span>
-                                    @break
-                                @case('confirmed')
-                                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">Confirmé</span>
-                                    @break
-                                @case('cancelled')
-                                    <span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">Annulé</span>
-                                    @break
-                                @default
-                                    <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">{{ $reservation->status }}</span>
-                            @endswitch
+                        @switch($reservation->status)
+                                        @case('Pending')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">En attente</span>
+                                            @break
+                                        @case('Done')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Terminée</span>
+                                            @break
+                                        @case('Refused')
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Annulé</span>
+                                            @break
+                                        @default
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">{{ $reservation->status }}</span>
+                                    @endswitch
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button onclick="openReservationModal(
@@ -131,7 +124,7 @@
 <!-- Reservation Modal -->
 <div id="reservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm" aria-hidden="true"></div>
         
         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -196,13 +189,13 @@
         statusElement.className = 'mt-1 text-sm px-2 py-1 rounded-full text-xs font-medium';
         
         switch(status.toLowerCase()) {
-            case 'confirmed':
+            case 'Done':
                 statusElement.classList.add('bg-green-100', 'text-green-800');
                 break;
-            case 'pending':
+            case 'Pending':
                 statusElement.classList.add('bg-yellow-100', 'text-yellow-800');
                 break;
-            case 'cancelled':
+            case 'Refused':
                 statusElement.classList.add('bg-red-100', 'text-red-800');
                 break;
             default:
