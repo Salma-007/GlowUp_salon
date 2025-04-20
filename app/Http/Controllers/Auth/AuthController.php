@@ -19,6 +19,15 @@ class AuthController extends Controller
     }
 
     public function index(){
+        if (auth()->check()) {
+            if (auth()->user()->hasRole('admin')) {
+                return redirect('/admin/dashboard');
+            } elseif (auth()->user()->hasRole('client')) {
+                return redirect('/home');
+            } else {
+                return redirect('/employee/planning');
+            }
+        }
         return view("auth.register");
     }
     
