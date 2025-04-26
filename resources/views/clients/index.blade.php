@@ -179,7 +179,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl font-bold mb-6">Prêt à révéler votre éclat naturel ?</h2>
             <p class="text-lg mb-8 max-w-3xl mx-auto">Réservez dès maintenant votre rendez-vous et laissez-nous prendre soin de vous</p>
-            <a href="" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-pink-600 bg-white hover:bg-gray-100">
+            <a href="{{ route('reservation-ajout') }}" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-pink-600 bg-white hover:bg-gray-100">
                 Réserver un rendez-vous
             </a>
         </div>

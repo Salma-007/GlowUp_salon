@@ -257,7 +257,7 @@ class ReservationController extends Controller
             ]);
     
             return redirect()
-                   ->route('clients.reservations.client_reservations')
+                   ->route('client.reservations')
                    ->with('success', 'Réservation marquée comme refusée avec succès.');
     
         } catch (Exception $e) {

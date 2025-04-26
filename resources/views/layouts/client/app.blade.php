@@ -9,10 +9,10 @@
     <!-- Flatpickr pour le calendrier -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
     <style>
-    html {
-        scroll-behavior: smooth;
-    }
-</style>
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
     @yield('styles')
 </head>
 <body class="bg-gray-50 font-sans">
@@ -28,7 +28,7 @@
                         <a href="{{ route('home') }}" class="border-transparent text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Accueil</a>
                         <a href="{{ route('services') }}" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Services</a>
                         @auth
-                            <a href="{{route('client.reservations')}}" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Mes Réservation</a>
+                            <a href="{{route('client.reservations')}}" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Mes réservations</a>
                         @endauth
                         <a href="#contact-section" class="border-transparent text-gray-500 hover:border-pink-500 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Contact</a>
                     </nav>
@@ -68,10 +68,14 @@
                         </div>
 
                     @else
-                        <div class="flex space-x-4">
-                            <a href="{{ route('login') }}" class="text-gray-700 hover:text-pink-600 font-medium">Connexion</a>
-                            <a href="{{ route('register') }}" class="bg-pink-600 text-white hover:bg-pink-700 px-4 py-2 rounded-md text-sm font-medium">Inscription</a>
-                        </div>
+                    <div class="flex space-x-3">
+    <a href="{{ route('login') }}" class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-md text-sm font-medium shadow-sm">
+        Connexion
+    </a>
+    <a href="{{ route('register') }}" class="bg-pink-600 text-white hover:bg-pink-700 px-4 py-2 rounded-md text-sm font-medium shadow-sm">
+        Inscription
+    </a>
+</div>
                     @endauth
                 </div>
                 <div class="-mr-2 flex items-center sm:hidden">

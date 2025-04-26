@@ -143,12 +143,10 @@
         const modal = document.getElementById('reservationModal');
         document.getElementById('modal_service_name').textContent = `Réserver: ${serviceName}`;
         
-        // Reset previous selections
         selectedEmployeeId = null;
         selectedDate = null;
         selectedTime = null;
         
-        // Update step indicators
         document.getElementById('step1').querySelector('div:first-child').classList.add('bg-pink-600', 'text-white');
         document.getElementById('step1').querySelector('div:first-child').classList.remove('bg-gray-300', 'text-gray-600');
         document.getElementById('step2').querySelector('div:first-child').classList.remove('bg-pink-600', 'text-white');
@@ -159,14 +157,11 @@
         document.getElementById('step2').querySelector('div:last-child').classList.remove('text-pink-600');
         document.getElementById('step2').querySelector('div:last-child').classList.add('text-gray-500');
         
-        // Show step 1, hide step 2
         document.getElementById('step1Content').classList.remove('hidden');
         document.getElementById('step2Content').classList.add('hidden');
         
-        // Disable next button until employee is selected
         document.getElementById('nextStepBtn').disabled = true;
         
-        // Populate employee cards
         const employeeContainer = document.getElementById('step1Content').querySelector('.grid');
         employeeContainer.innerHTML = '';
         
@@ -189,20 +184,17 @@
                 `;
                 
                 card.addEventListener('click', function() {
-                    // Remove selection from all cards
                     document.querySelectorAll('#step1Content .grid > div').forEach(c => {
                         c.classList.remove('border-pink-500', 'bg-pink-50');
                         c.classList.add('border-gray-200');
                     });
                     
-                    // Add selection to this card
                     this.classList.add('border-pink-500', 'bg-pink-50');
                     this.classList.remove('border-gray-200');
                     
                     selectedEmployeeId = employee.id;
                     selectedEmployeeName = employee.name;
                     
-                    // Enable next button
                     document.getElementById('nextStepBtn').disabled = false;
                 });
                 
