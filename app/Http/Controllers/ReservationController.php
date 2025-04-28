@@ -386,7 +386,6 @@ class ReservationController extends Controller
             $employeeId = $request->employee_id;
             $date = $request->date;
             $service = Service::findOrFail($request->service_id);
-            
 
             $startHour = 9; 
             $endHour = 16;   
