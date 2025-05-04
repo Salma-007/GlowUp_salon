@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -23,7 +24,7 @@ class ClientController extends Controller
         foreach($clients as $client)
         {
             $lastReservation = $client->reservations->isNotEmpty() 
-            ? \Carbon\Carbon::parse($client->reservations->first()->datetime)->format('d/m/Y H:i')
+            ? Carbon::parse($client->reservations->first()->datetime)->format('d/m/Y H:i')
             : 'null';
             
             $photoHtml = '<div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">

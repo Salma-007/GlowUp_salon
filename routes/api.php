@@ -14,7 +14,6 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 Route::post('/auth/register', [AuthController::class, 'createUser']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
-// Routes pour la réinitialisation de mot de passe (API)
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendVerificationCode']);
 Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
 Route::post('/validate-reset-code', [ResetPasswordController::class, 'validateResetCode']);

@@ -110,6 +110,16 @@ class ReservationController extends Controller
 
             $service = Service::findOrFail($request->service_id);
 
+            $selectedDateTime = new DateTime($request->datetime);
+            $currentDateTime = new DateTime(); 
+
+            if ($selectedDateTime < $currentDateTime) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous ne pouvez pas réserver un créneau dans le passé. Veuillez choisir une date et heure futures.'
+                ], 422);
+            }
+
             $startTime = new DateTime($request->datetime);
             $endTime = clone $startTime;
             $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
@@ -157,6 +167,7 @@ class ReservationController extends Controller
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la création de la réservation.' . $e->getMessage());
         }
     }
+    
 
     public function show(Reservation $reservation)
     {
@@ -257,7 +268,7 @@ class ReservationController extends Controller
             ]);
     
             return redirect()
-                   ->route('clients.reservations.client_reservations')
+                   ->route('client.reservations')
                    ->with('success', 'Réservation marquée comme refusée avec succès.');
     
         } catch (Exception $e) {
@@ -386,7 +397,6 @@ class ReservationController extends Controller
             $employeeId = $request->employee_id;
             $date = $request->date;
             $service = Service::findOrFail($request->service_id);
-            
 
             $startHour = 9; 
             $endHour = 16;   
@@ -442,7 +452,7 @@ class ReservationController extends Controller
             ->get()
             ->map(function ($reservation) {
                 return [
-                    'title' => $reservation->service->name . ' (' . $reservation->client->name . ')',
+                    'title' => 'réservation',
                     'start' => $reservation->datetime,
                     'end' => $reservation->end_time,
                     'color' => $this->getStatusColor($reservation->status),

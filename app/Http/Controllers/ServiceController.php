@@ -4,33 +4,29 @@ namespace App\Http\Controllers;
 
 use Exception;
 use App\Models\Service;
-use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Interfaces\ServiceRepositoryInterface;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 
 class ServiceController extends Controller
 {
+    protected $serviceRepository;
+
+    public function __construct(ServiceRepositoryInterface $serviceRepository)
+    {
+        $this->serviceRepository = $serviceRepository;
+    }
+
     public function index(Request $request)
     {
         try {
-            $query = Service::with(['category', 'reservations' => function($query) {
-
-                $query->whereMonth('datetime', now()->month)
-                      ->whereYear('datetime', now()->year);
-            }])->withCount(['reservations' => function($query) {
-                $query->whereMonth('datetime', now()->month)
-                      ->whereYear('datetime', now()->year);
-            }]);
+            $services = $this->serviceRepository->allWithCategoryAndMonthlyReservations(
+                $request->category
+            );
             
-            if ($request->has('category')) {
-                $query->where('category_id', $request->category);
-            }
-            
-            $services = $query->paginate(5);
-            $categories = Category::all(); 
+            $categories = $this->serviceRepository->getCategories();
     
             return view('admin.services.index', compact('services', 'categories'));
     
@@ -42,16 +38,7 @@ class ServiceController extends Controller
     public function search(Request $request)
     {
         $output = "";
-        $services = Service::with(['category'])
-        ->withCount(['reservations' => function($query) {
-            $query->whereMonth('datetime', now()->month)
-                  ->whereYear('datetime', now()->year);
-        }])
-        ->where(function($query) use ($request) {
-            $query->where('name', 'like', '%'.$request->search.'%')
-                ->orWhere('description', 'like', '%'.$request->search.'%');
-        })
-        ->get();
+        $services = $this->serviceRepository->searchWithCategoryAndMonthlyReservations($request->search);
 
         foreach($services as $service)
         {
@@ -108,7 +95,7 @@ class ServiceController extends Controller
     public function create()
     {
         try {
-            $categories = Category::all();
+            $categories = $this->serviceRepository->getCategories();
             return view('admin.services.create', compact('categories'));
 
         } catch (Exception $e) {
@@ -119,15 +106,7 @@ class ServiceController extends Controller
     public function store(StoreServiceRequest $request)
     {
         try {
-
-            $validatedData = $request->validated();
-
-            if ($request->hasFile('image')) {
-                $validatedData['image'] = $request->file('image')->store('services', 'public');
-            }
-
-            Service::create($validatedData);
-
+            $this->serviceRepository->create($request->validated());
             return redirect()->route('admin.services.index')->with('success', 'Service créé avec succès.');
 
         } catch (Exception $e) {
@@ -138,7 +117,7 @@ class ServiceController extends Controller
     public function edit(Service $service)
     {
         try {
-            $categories = Category::all();
+            $categories = $this->serviceRepository->getCategories();
             return view('admin.services.edit', compact('service', 'categories'));
 
         } catch (Exception $e) {
@@ -146,23 +125,10 @@ class ServiceController extends Controller
         }
     }
 
-
     public function update(UpdateServiceRequest $request, Service $service)
     {
         try {
-            $validatedData = $request->validated();
-
-            if ($request->hasFile('image')) {
-                if ($service->image) {
-                    Storage::disk('public')->delete($service->image);
-                }
-
-                $validatedData['image'] = $request->file('image')->store('services', 'public');
-            }
-    
-            $service->update($validatedData);
-
-
+            $this->serviceRepository->update($service->id, $request->validated());
             return redirect()->route('admin.services.index')->with('success', 'Service mis à jour avec succès.');
 
         } catch (Exception $e) {
@@ -173,7 +139,7 @@ class ServiceController extends Controller
     public function destroy(Service $service)
     {
         try {
-            $service->delete();
+            $this->serviceRepository->delete($service->id);
             return redirect()->route('admin.services.index')->with('success', 'Service supprimé avec succès.');
 
         } catch (Exception $e) {

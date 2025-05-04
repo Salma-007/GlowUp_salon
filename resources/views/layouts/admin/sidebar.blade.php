@@ -19,19 +19,34 @@
                 <!-- Clients Link -->
                 <a href="/admin/clients" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
                     <i class="fas fa-users mr-3 text-gray-400 group-hover:text-gray-600"></i>
+                    @if(auth()->user()->hasRole('admin'))
                     Gestion des clients
+                    @endif
+                    @if(!auth()->user()->hasRole('admin'))
+                    Voir Clients
+                    @endif
                 </a>
 
                 <!-- Employees Link -->
                 <a href="/admin/employees" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
                     <i class="fas fa-user-tie mr-3 text-gray-400 group-hover:text-gray-600"></i>
+                    @if(auth()->user()->hasRole('admin'))
                     Gestion des employés
+                    @endif
+                    @if(!auth()->user()->hasRole('admin'))
+                    Voir Employees
+                    @endif
                 </a>
 
                 <!-- Services Link -->
                 <a href="/admin/services" class="group flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm">
                     <i class="fas fa-cogs mr-3 text-gray-400 group-hover:text-gray-600"></i>
+                    @if(auth()->user()->hasRole('admin'))
                     Gestion des services
+                    @endif
+                    @if(!auth()->user()->hasRole('admin'))
+                    Voir Services
+                    @endif
                 </a>
                 @if(auth()->user()->hasPermission('see all planning'))
                 <!-- Reservations Link -->
