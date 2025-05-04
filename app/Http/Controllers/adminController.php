@@ -17,7 +17,11 @@ class adminController extends Controller
         }
 
         if (!auth()->user()->hasRole('admin')) {
-            return redirect()->route('employee.reservations'); 
+            if (auth()->user()->hasRole('client')) {
+                return redirect('/home');
+            } else {
+                return redirect('/employee/planning');
+            }
         }
 
         $totalClients = User::whereHas('roles', function($query) {

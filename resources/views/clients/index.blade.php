@@ -3,170 +3,189 @@
 @section('title', 'Accueil')
 
 @section('content')
-    <!-- Hero Section -->
     <section class="relative bg-gray-900 text-white">
         <div class="absolute inset-0 overflow-hidden">
             <img src="{{ asset('storage/pink_background.jpg') }}" alt="Salon GlowUp" class="w-full h-full object-cover opacity-40">
         </div>
-        <div class="relative max-w-7xl mx-auto px-4 py-24 sm:px-6 lg:px-8 flex flex-col items-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-center mb-6">Révélez votre éclat naturel</h1>
-            <p class="text-xl text-center max-w-3xl mb-10">Bienvenue chez GlowUp, votre salon esthétique de confiance pour des soins professionnels qui révèlent votre beauté</p>
-            <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <a href="{{ route('services') }}" class="bg-pink-600 hover:bg-pink-700 text-white font-medium px-6 py-3 rounded-md text-center">Nos services</a>
-                <a href="{{ route('reservation-ajout') }}" class="bg-white hover:bg-gray-100 text-pink-600 font-medium px-6 py-3 rounded-md text-center">Réserver maintenant</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Featured Services -->
-    <section class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Nos services populaires</h2>
-                
-                @if (session('error'))
-                    <div class="alert alert-error bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-                        {{ session('error') }}
-                    </div>
-                @endif
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Découvrez nos soins les plus appréciés pour une expérience de beauté complète</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            @foreach($services as $service)
-                <!-- Service Card 1 -->
-                <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md transition-transform duration-300 hover:shadow-lg hover:transform hover:-translate-y-1">
-                    <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}" class="w-full h-48 object-cover">
-                    <div class="p-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $service->name }}</h3>
-                        <p class="text-gray-600 mb-4">{{ $service->description }}</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-pink-600 font-bold">{{ $service->price }}$</span>
-                            <a href="{{route('services')}}" class="text-pink-600 hover:text-pink-800 font-medium">Réserver →</a>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-            </div>
-            
-            <div class="text-center mt-10">
-                <a href="{{ route('services') }}" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700">
-                    Voir tous nos services
+        <div class="relative max-w-7xl mx-auto px-4 py-32 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                Révélez votre <span class="text-pink-400">éclat naturel</span>
+            </h1>
+            <p class="text-xl max-w-3xl mb-10 opacity-90">
+                Bienvenue chez GlowUp, votre salon esthétique de confiance pour des soins professionnels qui subliment votre beauté
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="{{ route('services') }}" class="bg-pink-600 hover:bg-pink-700 text-white font-medium px-8 py-3 rounded-lg transition-colors shadow-lg">
+                    Découvrir nos services
+                </a>
+                <a href="{{ route('reservation-ajout') }}" class="bg-white hover:bg-gray-100 text-pink-600 font-medium px-8 py-3 rounded-lg transition-colors shadow-lg">
+                    Réserver maintenant
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Why Choose Us -->
-    <section class="py-16 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Pourquoi choisir GlowUp ?</h2>
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Nous nous engageons à vous offrir une expérience exceptionnelle à chaque visite</p>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Feature 1 -->
-                <div class="text-center p-6">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-pink-100 text-pink-600 mb-4">
-                        <i class="fas fa-award text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Expertise professionnelle</h3>
-                    <p class="text-gray-600">Notre équipe est composée de spécialistes qualifiés et expérimentés pour des résultats garantis.</p>
-                </div>
-                
-                <!-- Feature 2 -->
-                <div class="text-center p-6">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-pink-100 text-pink-600 mb-4">
-                        <i class="fas fa-leaf text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Produits naturels</h3>
-                    <p class="text-gray-600">Nous utilisons uniquement des produits de qualité, naturels et adaptés à tous les types de peau.</p>
-                </div>
-                
-                <!-- Feature 3 -->
-                <div class="text-center p-6">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-pink-100 text-pink-600 mb-4">
-                        <i class="fas fa-spa text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Ambiance relaxante</h3>
-                    <p class="text-gray-600">Un environnement paisible et élégant conçu pour votre confort et votre tranquillité.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials -->
     <section class="py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Ce que disent nos clients</h2>
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Découvrez les expériences de nos clients satisfaits</p>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4 relative inline-block">
+                    Nos services populaires
+                    <span class="absolute bottom-0 left-0 w-full h-1 bg-pink-500 transform translate-y-2"></span>
+                </h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Découvrez nos soins les plus appréciés pour une expérience de beauté complète
+                </p>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Testimonial 1 -->
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
-                    <div class="flex items-center mb-4">
-                        <div class="text-yellow-400 flex">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            @foreach($services as $service)
+            <div class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+                <div class="relative h-60 overflow-hidden">
+                    <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}" 
+                        class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                </div>
+
+                <div class="p-6 flex flex-col">
+                    <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $service->name }}</h3>
+                    <p class="text-gray-600 mb-4 line-clamp-2 flex-grow">{{ $service->description }}</p>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-pink-600 font-bold text-lg">{{ number_format($service->price, 2) }}€</span>
+                        <span class="text-gray-500 text-sm">{{ $service->duration }} min</span>
                     </div>
-                    <p class="text-gray-600 italic mb-4">"Le meilleur salon de beauté que j'ai jamais fréquenté. L'équipe est professionnelle et attentionnée. Je recommande vivement !"</p>
+
+                    <a href="{{ route('services') }}" 
+                    class="block text-center bg-pink-50 hover:bg-pink-100 text-pink-600 font-medium py-2 px-4 rounded-lg transition-colors">
+                        Réserver ce soin
+                    </a>
+                </div>
+            </div>
+            @endforeach
+        </div>
+            
+            <div class="text-center mt-12">
+                <a href="{{ route('services') }}" class="inline-flex items-center px-6 py-3 border border-transparent text-lg font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700 shadow-lg transition-colors">
+                    Voir tous nos services
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4 relative inline-block">
+                    Pourquoi choisir GlowUp ?
+                    <span class="absolute bottom-0 left-0 w-full h-1 bg-pink-500 transform translate-y-2"></span>
+                </h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Nous nous engageons à vous offrir une expérience exceptionnelle à chaque visite
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center">
+                    <div class="mx-auto w-16 h-16 rounded-full bg-pink-100 text-pink-600 mb-4 flex items-center justify-center">
+                        <i class="fas fa-award text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Expertise professionnelle</h3>
+                    <p class="text-gray-600">Nos spécialistes qualifiés vous garantissent des résultats impeccables et durables.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center">
+                    <div class="mx-auto w-16 h-16 rounded-full bg-pink-100 text-pink-600 mb-4 flex items-center justify-center">
+                        <i class="fas fa-leaf text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Produits naturels</h3>
+                    <p class="text-gray-600">Nous sélectionnons des produits haut de gamme, naturels et respectueux de votre peau.</p>
+                </div>
+
+                <div class="bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow text-center">
+                    <div class="mx-auto w-16 h-16 rounded-full bg-pink-100 text-pink-600 mb-4 flex items-center justify-center">
+                        <i class="fas fa-spa text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 mb-3">Ambiance luxueuse</h3>
+                    <p class="text-gray-600">Un havre de paix conçu pour votre bien-être et votre détente absolue.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-4 relative inline-block">
+                    Témoignages clients
+                    <span class="absolute bottom-0 left-0 w-full h-1 bg-pink-500 transform translate-y-2"></span>
+                </h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Ils nous ont fait confiance et partagent leur expérience
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <div class="flex mb-4">
+                        @for ($i = 0; $i < 5; $i++)
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        @endfor
+                    </div>
+                    <p class="text-gray-600 italic mb-6">"Le meilleur salon que j'ai connu. Un professionnalisme rare allié à une ambiance chaleureuse."</p>
                     <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-user-circle text-2xl text-gray-400"></i>
+                        <div class="flex-shrink-0 bg-pink-100 text-pink-600 rounded-full w-10 h-10 flex items-center justify-center">
+                            <i class="fas fa-user"></i>
                         </div>
                         <div class="ml-3">
                             <p class="text-sm font-medium text-gray-900">Sophie Martin</p>
+                            <p class="text-xs text-gray-500">Cliente fidèle</p>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Testimonial 2 -->
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
-                    <div class="flex items-center mb-4">
-                        <div class="text-yellow-400 flex">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <div class="flex mb-4">
+                        @for ($i = 0; $i < 5; $i++)
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        @endfor
                     </div>
-                    <p class="text-gray-600 italic mb-4">"Le massage relaxant est incroyable ! J'ai adoré l'atmosphère paisible et le professionnalisme du personnel. Je reviendrai certainement."</p>
+                    <p class="text-gray-600 italic mb-6">"Des résultats toujours au rendez-vous. Mon rendez-vous mensuel chez GlowUp est un rituel sacré."</p>
                     <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-user-circle text-2xl text-gray-400"></i>
+                        <div class="flex-shrink-0 bg-pink-100 text-pink-600 rounded-full w-10 h-10 flex items-center justify-center">
+                            <i class="fas fa-user"></i>
                         </div>
                         <div class="ml-3">
                             <p class="text-sm font-medium text-gray-900">Thomas Dubois</p>
+                            <p class="text-xs text-gray-500">Depuis 2 ans</p>
                         </div>
                     </div>
                 </div>
-                
-                <!-- Testimonial 3 -->
-                <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
-                    <div class="flex items-center mb-4">
-                        <div class="text-yellow-400 flex">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star-half-alt"></i>
-                        </div>
+
+                <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                    <div class="flex mb-4">
+                        @for ($i = 0; $i < 4; $i++)
+                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        @endfor
+                        <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                        </svg>
                     </div>
-                    <p class="text-gray-600 italic mb-4">"J'ai offert un bon cadeau à ma mère et elle a été enchantée par son expérience. Le personnel est chaleureux et les résultats sont exceptionnels."</p>
+                    <p class="text-gray-600 italic mb-6">"J'ai offert un bon cadeau à ma mère qui a été ravie. Le personnel est aux petits soins."</p>
                     <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-user-circle text-2xl text-gray-400"></i>
+                        <div class="flex-shrink-0 bg-pink-100 text-pink-600 rounded-full w-10 h-10 flex items-center justify-center">
+                            <i class="fas fa-user"></i>
                         </div>
                         <div class="ml-3">
                             <p class="text-sm font-medium text-gray-900">Julie Petit</p>
+                            <p class="text-xs text-gray-500">Nouvelle cliente</p>
                         </div>
                     </div>
                 </div>
@@ -174,112 +193,109 @@
         </div>
     </section>
 
-    <!-- CTA -->
     <section class="py-16 bg-pink-600 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl font-bold mb-6">Prêt à révéler votre éclat naturel ?</h2>
-            <p class="text-lg mb-8 max-w-3xl mx-auto">Réservez dès maintenant votre rendez-vous et laissez-nous prendre soin de vous</p>
-            <a href="{{ route('reservation-ajout') }}" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-pink-600 bg-white hover:bg-gray-100">
-                Réserver un rendez-vous
-            </a>
+            <h2 class="text-3xl font-bold mb-6">Prêt à révéler votre éclat ?</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">
+                Réservez dès maintenant votre rendez-vous pour une expérience unique
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{{ route('reservation-ajout') }}" class="bg-white hover:bg-gray-100 text-pink-600 font-bold px-8 py-4 rounded-lg shadow-lg transition-colors">
+                    Prendre rendez-vous
+                </a>
+                <a href="tel:+33123456789" class="bg-transparent hover:bg-pink-700 border-2 border-white text-white font-bold px-8 py-4 rounded-lg transition-colors">
+                    <i class="fas fa-phone-alt mr-2"></i>Nous appeler
+                </a>
+            </div>
         </div>
     </section>
 
-<!-- Modal pour la réservation -->
-<div id="reservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <!-- Fond flou -->
-    <div class="fixed inset-0 bg-opacity-50 backdrop-blur-sm" aria-hidden="true"></div>
-
-    <!-- Contenu de la modal -->
-    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <h3 class="text-lg font-medium leading-6 text-gray-900" id="modalTitle">Réserver un service</h3>
-
-                <!-- Afficher les erreurs de validation -->
-                @if ($errors->any())
-                    <div class="alert alert-error bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form id="reservationForm" action="{{ route('new_reservation') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="service_id" id="service_id">
-
-                    <!-- Sélection de la date -->
-                    <div class="mt-4">
-                        <label for="datetime" class="block text-sm font-medium text-gray-700">Date et heure</label>
-                        <input type="datetime-local" name="datetime" id="datetime" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500" required value="{{ old('datetime') }}">
-                    </div>
-
-                    <!-- Sélection de l'employé -->
-                    <div class="mt-4">
-                        <label for="employee_id" class="block text-sm font-medium text-gray-700">Choisir un employé</label>
-                        <select name="employee_id" id="employee_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-pink-500 focus:ring-pink-500" required>
-                            @foreach($employees as $employee)
-                                <option value="{{ $employee->id }}" {{ old('employee_id') == $employee->id ? 'selected' : '' }}>{{ $employee->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Boutons de la modal -->
-                    <div class="mt-6 flex justify-end">
-                        <button type="button" onclick="closeModal()" class="mr-2 inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
-                            Annuler
-                        </button>
-                        <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-pink-600 border border-transparent rounded-md hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500">
-                            Réserver
-                        </button>
-                    </div>
-                </form>
+    <div id="reservationModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" aria-hidden="true"></div>
+        
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
+                <div class="bg-pink-600 px-6 py-4">
+                    <h3 class="text-xl font-bold text-white">Réserver un soin</h3>
+                </div>
+                
+                <div class="p-6">
+                    @if ($errors->any())
+                        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+                    
+                    <form id="reservationForm" action="{{ route('new_reservation') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="service_id" id="service_id">
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label for="datetime" class="block text-sm font-medium text-gray-700 mb-1">Date et heure</label>
+                                <input type="datetime-local" name="datetime" id="datetime" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500" 
+                                       required>
+                            </div>
+                            
+                            <div>
+                                <label for="employee_id" class="block text-sm font-medium text-gray-700 mb-1">Employé</label>
+                                <select name="employee_id" id="employee_id" 
+                                        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-pink-500 focus:border-pink-500" 
+                                        required>
+                                    @foreach($employees as $employee)
+                                        <option value="{{ $employee->id }}">{{ $employee->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div class="flex justify-end space-x-3 pt-4">
+                                <button type="button" onclick="closeModal()" 
+                                        class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+                                    Annuler
+                                </button>
+                                <button type="submit" 
+                                        class="px-4 py-2 bg-pink-600 text-white rounded-md hover:bg-pink-700">
+                                    Confirmer
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @section('scripts')
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        @if ($errors->any())
-            openModal({{ old('service_id') }});
-        @endif
-    });
 
-    function openModal(serviceId) {
-        document.getElementById('service_id').value = serviceId; 
-        document.getElementById('reservationModal').classList.remove('hidden'); 
+    function openReservationModal(serviceId) {
+        document.getElementById('service_id').value = serviceId;
+        document.getElementById('reservationModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
     }
 
     function closeModal() {
-        document.getElementById('reservationModal').classList.add('hidden'); 
+        document.getElementById('reservationModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
     }
 
-    const modal = document.getElementById('reservationModal');
-    modal.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            closeModal();
-        }
-    });
-</script>
-
-<script>
     document.addEventListener('DOMContentLoaded', function() {
-        const serviceCards = document.querySelectorAll('.grid > div');
-        serviceCards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.classList.add('shadow-lg');
-            });
-            card.addEventListener('mouseleave', function() {
-                this.classList.remove('shadow-lg');
-            });
+        const modal = document.getElementById('reservationModal');
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
         });
+
+        @if ($errors->any())
+            openReservationModal({{ old('service_id') }});
+        @endif
     });
 </script>
 @endsection

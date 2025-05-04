@@ -54,7 +54,7 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                @if($reservation->status !== 'Refused' && $reservation->status !== 'Done')
+                                @if($reservation->status == 'Pending' )
                                     <button onclick="openEditModal({{ $reservation->id }}, '{{ $reservation->datetime }}', {{ $reservation->employee_id }})" 
                                             class="text-indigo-600 hover:text-indigo-900 mr-2">
                                         Modifier
@@ -145,7 +145,6 @@ function openEditModal(reservationId, datetime, employeeId) {
 
     document.getElementById('editReservationModal').classList.remove('hidden');
     
-    <!-- Ajoutez ceci après les messages de session existants -->
     @if($errors->any())
         <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
             <ul>
