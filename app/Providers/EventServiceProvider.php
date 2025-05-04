@@ -2,13 +2,15 @@
 
 namespace App\Providers;
 
+use App\Events\ReservationCreated;
 use Illuminate\Support\ServiceProvider;
+use App\Listeners\AddReservationToPlanning;
 
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
-        'App\Events\ReservationCreated' => [
-            'App\Listeners\AddReservationToPlanning',
+        'ReservationCreated' => [
+            'AddReservationToPlanning',
         ],
     ];
     public function register(): void

@@ -110,6 +110,16 @@ class ReservationController extends Controller
 
             $service = Service::findOrFail($request->service_id);
 
+            $selectedDateTime = new DateTime($request->datetime);
+            $currentDateTime = new DateTime(); 
+
+            if ($selectedDateTime < $currentDateTime) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous ne pouvez pas réserver un créneau dans le passé. Veuillez choisir une date et heure futures.'
+                ], 422);
+            }
+
             $startTime = new DateTime($request->datetime);
             $endTime = clone $startTime;
             $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
@@ -157,6 +167,7 @@ class ReservationController extends Controller
             return redirect()->back()->with('error', 'Une erreur est survenue lors de la création de la réservation.' . $e->getMessage());
         }
     }
+    
 
     public function show(Reservation $reservation)
     {

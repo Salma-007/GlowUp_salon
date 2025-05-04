@@ -52,10 +52,9 @@
         </div>
     </header>
 
-    <!-- Main content area -->
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gray-50">
         <div class="max-w-7xl mx-auto">
-            <!-- Welcome section with performance overview -->
+
             <div class="bg-white rounded-xl shadow-md p-6 mb-8 border border-gray-100">
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between">
                     <div>
@@ -65,9 +64,8 @@
                 </div>
             </div>
 
-            <!-- Stats -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Client stats card -->
+
                 <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-blue-100">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 text-blue-600">
@@ -88,7 +86,6 @@
                     </div>
                 </div>
 
-                <!-- Employee stats card -->
                 <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-blue-100">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-lg bg-emerald-100 text-emerald-600">
@@ -109,7 +106,6 @@
                     </div>
                 </div>
 
-                <!-- Services stats card -->
                 <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-blue-100">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 text-purple-600">
@@ -130,7 +126,6 @@
                     </div>
                 </div>
 
-                <!-- Reservations stats card -->
                 <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 transition-all duration-300 hover:shadow-lg hover:border-blue-100">
                     <div class="flex items-center">
                         <div class="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-lg bg-amber-100 text-amber-600">
@@ -152,9 +147,8 @@
                 </div>
             </div>
 
-            <!-- Activity and Recent Bookings -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                <!-- Recent Activity -->
+
                 <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
                     <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
                         <h3 class="text-lg font-semibold text-gray-900">Activité Récente</h3>

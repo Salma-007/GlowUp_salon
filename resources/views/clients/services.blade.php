@@ -5,7 +5,6 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
 
-    <!-- Header avec filtre -->
     <div class="bg-white rounded-xl shadow-sm p-6 flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Nos Prestations</h1>
@@ -45,10 +44,10 @@
     <!-- Liste des services -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach($services as $service)
-        <div class="bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+        <div class="bg-white rounded-xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group">
             <div class="relative h-48 overflow-hidden">
                 <img src="{{ asset('storage/' . $service->image) }}" alt="{{ $service->name }}" 
-                     class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
+                    class="w-full h-full object-cover transition-transform duration-500 hover:scale-105">
                 <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
             </div>
             
@@ -59,8 +58,13 @@
                         {{ $service->category->name }}
                     </span>
                 </div>
-                
-                <p class="text-gray-600 mb-4 line-clamp-2">{{ $service->description }}</p>
+
+                <div class="relative mb-4">
+                    <p class="text-gray-600 line-clamp-2 group-hover:line-clamp-none group-hover:pb-6 transition-all duration-300">
+                        {{ $service->description }}
+                    </p>
+                    <div class="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white to-transparent opacity-100 group-hover:opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+                </div>
                 
                 <div class="flex justify-between items-center">
                     <div>
@@ -80,7 +84,6 @@
         @endforeach
     </div>
 
-    <!-- Pagination -->
     @if ($services->hasPages())
         <div class="mt-8">
             {{ $services->links('vendor.pagination.tailwind') }}
@@ -88,22 +91,19 @@
     @endif
 </div>
 
-<!-- Modal de réservation -->
 <div id="reservationModal" class="hidden fixed inset-0 bg-black/30 backdrop-blur-sm overflow-y-auto h-full w-full z-50 p-4">
     <div class="relative mx-auto p-0 w-full max-w-2xl">
-        <!-- Modal content -->
+
         <div class="bg-white rounded-xl shadow-xl overflow-hidden">
-            <!-- Header -->
+
             <div class="bg-pink-600 px-6 py-4">
                 <h3 class="text-lg font-medium text-white" id="modal_service_name"></h3>
             </div>
-            
-            <!-- Error message -->
+
             <div id="modalError" class="hidden bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mx-6 mt-4 rounded">
                 <p id="modalErrorMessage"></p>
             </div>
 
-            <!-- Stepper -->
             <div class="flex justify-center py-6 px-6">
                 <div class="flex items-center w-full max-w-md">
                     <div id="step1" class="flex flex-col items-center flex-1">
@@ -124,10 +124,10 @@
                 </div>
             </div>
 
-            <!-- Step 1 Content -->
+            <!-- step 1  -->
             <div id="step1Content" class="px-6 pb-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Employee cards will be inserted here by JavaScript -->
+                    <!-- employees here by js -->
                 </div>
                 <div class="flex justify-end mt-6 space-x-3">
                     <button type="button" onclick="closeModal()"
@@ -144,13 +144,13 @@
                 </div>
             </div>
 
-            <!-- Step 2 Content -->
+            <!-- step 2 -->
             <div id="step2Content" class="hidden px-6 pb-6">
                 <div class="mb-4">
                     <div id="calendar" class="mb-6"></div>
                     <div class="mb-2 text-sm font-medium text-gray-700">Créneaux disponibles :</div>
                     <div id="timeSlots" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                        <!-- Time slots will be inserted here by JavaScript -->
+                        <!-- timeslots by js -->
                     </div>
                 </div>
                 <div class="flex justify-between mt-6 space-x-3">
@@ -464,26 +464,29 @@ function confirmReservation() {
                     service_id: selectedServiceId,
                     employee_id: selectedEmployeeId,
                     datetime: datetime,
-                    status: 'pending',
-                    _method: 'POST'
+                    status: 'pending'
                 })
             })
             .then(response => {
                 if (!response.ok) {
-                    return response.text().then(text => {
-                        throw new Error(text || 'Erreur serveur');
+                    return response.json().then(err => {
+                        throw new Error(err.message || 'Erreur serveur');
                     });
                 }
                 return response.json();
             })
             .then(data => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Succès',
-                    text: 'Réservation confirmée!',
-                    timer: 3000
-                });
-                closeModal();
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Succès',
+                        text: data.message,
+                        timer: 3000
+                    });
+                    closeModal();
+                } else {
+                    throw new Error(data.message);
+                }
             })
             .catch(error => {
                 console.error('Error:', error);

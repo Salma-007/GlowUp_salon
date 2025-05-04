@@ -88,7 +88,6 @@
                                 '{{ \Carbon\Carbon::parse($reservation->datetime)->format('d/m/Y') }}',
                                 '{{ \Carbon\Carbon::parse($reservation->datetime)->format('H:i') }}',
                                 '{{ $reservation->service->duration }}',
-                                '{{ $reservation->notes ?? 'Aucune note' }}',
                                 '{{ $reservation->id }}'
                             )" class="text-blue-600 hover:text-blue-900 mr-2">
                                 Voir
@@ -158,10 +157,6 @@
                         <p class="text-sm font-medium text-gray-500">Durée</p>
                         <p id="modalDuration" class="mt-1 text-sm text-gray-900"></p>
                     </div>
-                    <div class="col-span-2">
-                        <p class="text-sm font-medium text-gray-500">Notes</p>
-                        <p id="modalNotes" class="mt-1 text-sm text-gray-900"></p>
-                    </div>
                 </div>
             </div>
             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
@@ -178,7 +173,7 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/fr.js"></script>
 
 <script>
-    function openReservationModal(service, client, employee, status, date, time, duration, notes, reservationId) {
+    function openReservationModal(service, client, employee, status, date, time, duration, reservationId) {
         document.getElementById('modalService').textContent = service;
         document.getElementById('modalClient').textContent = client;
         document.getElementById('modalEmployee').textContent = employee;
@@ -204,7 +199,6 @@
         
         document.getElementById('modalDate').textContent = date;
         document.getElementById('modalTime').textContent = time;
-        document.getElementById('modalNotes').textContent = notes;
         
         document.getElementById('reservationModal').classList.remove('hidden');
     }
@@ -242,8 +236,7 @@
                         duration: '{{ $reservation->service->duration }} minutes',
                         status: '{{ $reservation->status }}',
                         date: '{{ \Carbon\Carbon::parse($reservation->datetime)->format('d/m/Y') }}',
-                        time: '{{ \Carbon\Carbon::parse($reservation->datetime)->format('H:i') }}',
-                        notes: '{{ $reservation->notes ?? 'Aucune note' }}'
+                        time: '{{ \Carbon\Carbon::parse($reservation->datetime)->format('H:i') }}'
                     }
                 },
                 @endforeach
@@ -257,7 +250,6 @@
                     info.event.extendedProps.date,
                     info.event.extendedProps.time,
                     info.event.extendedProps.duration,
-                    info.event.extendedProps.notes
                 );
             }
         });

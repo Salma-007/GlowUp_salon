@@ -16,9 +16,8 @@
             </div>
         @endif
         
-        <form action="{{ route('new_reservation') }}" method="POST" class="bg-white p-6 rounded-lg shadow-md">
+        <form id="reservationForm" action="{{ route('new_reservation') }}" method="POST" class="bg-white p-6 rounded-lg shadow-md">
             @csrf
-            
             <div class="mb-4">
                 <label for="service_id" class="block text-gray-700 font-medium mb-2">Service</label>
                 <select name="service_id" id="service_id" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-600">
@@ -59,6 +58,7 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const serviceSelect = document.getElementById('service_id');
@@ -66,10 +66,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingIndicator = document.getElementById('employee_loading');
     const errorDisplay = document.getElementById('employee_error');
     const submitBtn = document.getElementById('submit_btn');
+    const reservationForm = document.getElementById('reservationForm');
     let employeesLoaded = false;
 
+    
     function loadEmployees(serviceId) {
-
         employeeSelect.innerHTML = '<option value="">Chargement...</option>';
         employeeSelect.disabled = true;
         loadingIndicator.classList.remove('hidden');
@@ -119,6 +120,64 @@ document.addEventListener('DOMContentLoaded', function() {
         const employeeSelected = employeeSelect.value && employeeSelect.value !== '';
         submitBtn.disabled = !(serviceSelected && employeeSelected && employeesLoaded);
     }
+
+    reservationForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            En cours...
+        `;
+
+        fetch(reservationForm.action, {
+            method: 'POST',
+            body: new FormData(reservationForm),
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Erreur lors de la réservation');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            Swal.fire({
+                icon: 'success',
+                title: 'Réservation confirmée!',
+                text: 'Votre réservation a été enregistrée avec succès.',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                reservationForm.reset();
+                employeeSelect.innerHTML = '<option value="">Sélectionnez un service</option>';
+                employeeSelect.disabled = true;
+                serviceSelect.value = '';
+                updateSubmitButton();
+            });
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: error.message,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Réserver';
+        });
+    });
 
     serviceSelect.addEventListener('change', function() {
         if (this.value) {
