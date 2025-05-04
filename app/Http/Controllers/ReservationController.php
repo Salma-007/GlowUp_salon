@@ -452,7 +452,7 @@ class ReservationController extends Controller
             ->get()
             ->map(function ($reservation) {
                 return [
-                    'title' => $reservation->service->name . ' (' . $reservation->client->name . ')',
+                    'title' => 'réservation',
                     'start' => $reservation->datetime,
                     'end' => $reservation->end_time,
                     'color' => $this->getStatusColor($reservation->status),
