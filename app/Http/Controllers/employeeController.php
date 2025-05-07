@@ -98,7 +98,7 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        $roles = Role::all();
+        $roles = Role::whereNotIn('name', ['admin', 'client'])->get();
         $services = Service::all(); 
         return view('admin.employees.add-employee', [
             'roles' => $roles,
@@ -133,14 +133,15 @@ class EmployeeController extends Controller
 
             return redirect()->route('admin.employees.employee-manage')->with('success', 'Utilisateur créé avec succès et mot de passe envoyé par e-mail.');
     
-        } catch (Exception $e) {
-            return redirect()->back()->with('error', 'Une erreur s\'est produite lors de la création de l\'utilisateur : ' . $e->getMessage())->withInput();
+        } catch (\Exception $e) {
+            return back()->withInput()
+               ->withErrors(['error' => 'Une erreur s\'est produite lors de la mise à jour de l\'employé.']);
         }
     }
 
     public function edit(User $employee)
     {
-        $roles = Role::all();
+        $roles = Role::whereNotIn('name', ['admin', 'client'])->get();
         $services = Service::all(); 
         $employeeServices = $employee->services->pluck('id')->toArray();
     
@@ -169,7 +170,8 @@ class EmployeeController extends Controller
             return redirect()->route('admin.employees.index')->with('success', 'Employé mis à jour avec succès.');
 
         } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'Une erreur s\'est produite lors de la mise à jour de l\'employé.']);
+            return back()->withInput()
+               ->withErrors(['error' => 'Une erreur s\'est produite lors de la mise à jour de l\'employé.']);
         }
     }
 

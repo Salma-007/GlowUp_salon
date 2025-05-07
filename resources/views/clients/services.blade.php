@@ -193,6 +193,7 @@
     let calendar = null;
 
     function openReservationModal(serviceId, serviceName, employees) {
+        @auth
         selectedServiceId = serviceId;
         selectedServiceName = serviceName;
         
@@ -262,6 +263,9 @@
         
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        @else
+            window.location.href = "{{ route('login') }}?redirect=" + encodeURIComponent(window.location.pathname);
+        @endauth
     }
 
     function goToStep2() {
@@ -385,7 +389,6 @@
             return response.json();
         })
         .then(data => {
-            console.log('Received data:', data);
             const timeSlotsContainer = document.getElementById('timeSlots');
             timeSlotsContainer.innerHTML = '';
             

@@ -92,7 +92,7 @@
                             <!-- Email -->
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700">Adresse email</label>
-                                <input type="email" name="email" id="email" value="{{ old('email', auth()->user()->email) }}"
+                                <input type="text" name="email" id="email" value="{{ old('email', auth()->user()->email) }}"
                                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 @error('email')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>

@@ -21,7 +21,8 @@ class ReservationController extends Controller
     {
         try {
             $now = now()->timezone(config('app.timezone'));
-            
+
+            // pour update à chaque fois les status des reservations
             Reservation::where('end_time', '<', $now)
                 ->whereNotIn('status', ['Done', 'Refused'])
                 ->update(['status' => 'Done']);
@@ -471,5 +472,6 @@ class ReservationController extends Controller
             default: return '#007BFF'; 
         }
     }
+
 
 }

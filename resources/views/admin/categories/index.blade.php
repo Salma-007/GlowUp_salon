@@ -2,47 +2,45 @@
 
 @section('content')
 <div class="flex-1 flex flex-col overflow-hidden">
-    <!-- Header amélioré -->
+
     <header class="bg-white shadow-md sticky top-0 z-10">
-    <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
-        <h1 class="text-xl font-bold text-gray-800">Gestion des Catégories</h1>
-        
-        <!-- Conteneur pour aligner le bouton et l'utilisateur -->
-        <div class="flex items-center gap-4 ml-auto">
-            <!-- Bouton Ajouter une Catégorie -->
-            @if(auth()->user()->hasRole('admin'))
-            <button onclick="openAddCategoryModal()" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 flex items-center">
-                <i class="fas fa-plus mr-2"></i>
-                Ajouter une Catégorie
-            </button>
-            @endif
-            <!-- Profil utilisateur -->
-            <div class="relative">
-                <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <span class="sr-only">Ouvrir le menu utilisateur</span>
-                    <div class="flex items-center">
-                        @if(Auth::user()->photo)
-                            <img class="h-8 w-8 rounded-full object-cover" 
-                                src="{{ asset('storage/' . Auth::user()->photo) }}" 
-                                alt="Photo de profil de {{ Auth::user()->name }}">
-                        @else
-                            <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                <i class="fas fa-user text-gray-500"></i>
-                            </div>
-                        @endif
-                        <span class="hidden md:block ml-2 text-gray-700">{{ Auth::user()->name }}</span>
-                    </div>
+        <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+            <h1 class="text-xl font-bold text-gray-800">Gestion des Catégories</h1>
+
+            <div class="flex items-center gap-4 ml-auto">
+
+                @if(auth()->user()->hasRole('admin'))
+                <button onclick="openAddCategoryModal()" 
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-300 flex items-center">
+                    <i class="fas fa-plus mr-2"></i>
+                    Ajouter une Catégorie
                 </button>
+                @endif
+
+                <div class="relative">
+                    <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <span class="sr-only">Ouvrir le menu utilisateur</span>
+                        <div class="flex items-center">
+                            @if(Auth::user()->photo)
+                                <img class="h-8 w-8 rounded-full object-cover" 
+                                    src="{{ asset('storage/' . Auth::user()->photo) }}" 
+                                    alt="Photo de profil de {{ Auth::user()->name }}">
+                            @else
+                                <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-user text-gray-500"></i>
+                                </div>
+                            @endif
+                            <span class="hidden md:block ml-2 text-gray-700">{{ Auth::user()->name }}</span>
+                        </div>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
 
-    <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-gray-50">
         <div class="max-w-7xl mx-auto space-y-6">
-            <!-- Messages flash stylés -->
+
             @if (session('success'))
             <div class="p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
                 <div class="flex items-center">
@@ -69,7 +67,6 @@
             </div>
             @endif
 
-            <!-- Carte des statistiques -->
             <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
                 <div class="bg-white overflow-hidden shadow rounded-lg">
                     <div class="px-4 py-5 sm:p-6">
@@ -86,7 +83,6 @@
                 </div>
             </div>
 
-            <!-- Tableau amélioré -->
             <div class="bg-white shadow overflow-hidden sm:rounded-lg">
                 <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
                     <div class="flex items-center justify-between">
@@ -143,10 +139,9 @@
     </main>
 </div>
 
-<!-- Modals améliorés -->
 <div id="addCategoryModal" class="hidden fixed inset-0 z-50 overflow-y-auto backdrop-blur-sm">
     <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0  bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <div class="fixed inset-0 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
         
         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -157,10 +152,11 @@
                     <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                         <h3 class="text-lg leading-6 font-medium text-gray-900">Ajouter une Catégorie</h3>
                         <div class="mt-4">
-                            <form action="{{ route('admin.categories.store') }}" method="POST">
+                            <form id="addCategoryForm" action="{{ route('admin.categories.store') }}" method="POST">
                                 @csrf
                                 <input type="text" name="name" placeholder="Nom de la catégorie" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <div id="addCategoryError" class="mt-2 text-sm text-red-600 hidden"></div>
                                 <div class="mt-6 flex justify-end space-x-3">
                                     <button type="button" onclick="closeAddCategoryModal()" 
                                         class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -199,6 +195,7 @@
                                 <input type="hidden" id="editCategoryId" name="id">
                                 <input type="text" id="editCategoryName" name="name" placeholder="Nom de la catégorie" 
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <div id="editCategoryError" class="mt-2 text-sm text-red-600 hidden"></div>
                                 <div class="mt-6 flex justify-end space-x-3">
                                     <button type="button" onclick="closeEditCategoryModal()" 
                                         class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -217,10 +214,13 @@
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     function openAddCategoryModal() {
         document.getElementById('addCategoryModal').classList.remove('hidden');
+
+        document.getElementById('addCategoryError').classList.add('hidden');
+        document.getElementById('addCategoryError').textContent = '';
     }
 
     function closeAddCategoryModal() {
@@ -232,6 +232,9 @@
         document.getElementById('editCategoryName').value = name;
         document.getElementById('editCategoryForm').action = `/admin/categories/${id}`;
         document.getElementById('editCategoryModal').classList.remove('hidden');
+
+        document.getElementById('editCategoryError').classList.add('hidden');
+        document.getElementById('editCategoryError').textContent = '';
     }
 
     function closeEditCategoryModal() {
@@ -266,7 +269,69 @@
                     }
                 });
             }
-        })
+        });
     }
+
+    document.getElementById('addCategoryForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+        const errorElement = document.getElementById('addCategoryError');
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                if (data.errors) {
+                    errorElement.textContent = data.errors.name ? data.errors.name[0] : 'Une erreur est survenue';
+                    errorElement.classList.remove('hidden');
+                }
+            }
+        } catch (error) {
+            errorElement.textContent = 'Une erreur réseau est survenue';
+            errorElement.classList.remove('hidden');
+            console.error('Error:', error);
+        }
+    });
+
+    document.getElementById('editCategoryForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = this;
+        const formData = new FormData(form);
+        const errorElement = document.getElementById('editCategoryError');
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                if (data.errors) {
+                    errorElement.textContent = data.errors.name ? data.errors.name[0] : 'Une erreur est survenue';
+                    errorElement.classList.remove('hidden');
+                }
+            }
+        } catch (error) {
+            errorElement.textContent = 'Une erreur réseau est survenue';
+            errorElement.classList.remove('hidden');
+            console.error('Error:', error);
+        }
+    });
 </script>
 @endsection
