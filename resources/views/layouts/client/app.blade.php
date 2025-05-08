@@ -164,15 +164,15 @@
                     <ul class="space-y-2 text-gray-300">
                         <li class="flex items-start">
                             <i class="fas fa-map-marker-alt mt-1 mr-2 text-pink-400"></i>
-                            <span>123 Avenue de la Beauté, 75001 Paris</span>
+                            <span>123 Agadir Bay, 75001 Agadir</span>
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-phone-alt mt-1 mr-2 text-pink-400"></i>
-                            <span>+33 1 23 45 67 89</span>
+                            <span>+212 61 23 45 67 89</span>
                         </li>
                         <li class="flex items-start">
                             <i class="fas fa-envelope mt-1 mr-2 text-pink-400"></i>
-                            <span>contact@glowup.fr</span>
+                            <span>contact@glowup.com</span>
                         </li>
                     </ul>
                 </div>

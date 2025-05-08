@@ -22,7 +22,6 @@ class ReservationController extends Controller
         try {
             $now = now()->timezone(config('app.timezone'));
 
-            // pour update à chaque fois les status des reservations
             Reservation::where('end_time', '<', $now)
                 ->whereNotIn('status', ['Done', 'Refused'])
                 ->update(['status' => 'Done']);
@@ -486,7 +485,6 @@ class ReservationController extends Controller
             $client = Auth::user();
             $service = Service::findOrFail($request->service_id);
 
-            // Vérification date/heure
             $selectedDateTime = new DateTime($request->datetime);
             $currentDateTime = new DateTime(); 
 
@@ -497,12 +495,11 @@ class ReservationController extends Controller
                 ], 422);
             }
 
-            // Calcul des horaires
             $startTime = new DateTime($request->datetime);
             $endTime = clone $startTime;
             $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
 
-            // Vérification disponibilité employé
+
             $isEmployeeAvailable = !Reservation::where('employee_id', $request->employee_id)
                 ->where(function($query) use ($startTime, $endTime) {
                     $query->whereBetween('datetime', [$startTime, $endTime])
