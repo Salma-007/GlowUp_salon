@@ -34,7 +34,7 @@
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                 <div class="mt-1">
-                    <input type="email" id="email" name="email" required
+                    <input type="email" id="email" name="email" 
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300"
                            placeholder="votre@email.com">
                 </div>
@@ -42,7 +42,7 @@
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
                 <div class="mt-1">
-                    <input type="password" id="password" name="password" required
+                    <input type="password" id="password" name="password" 
                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-300"
                            placeholder="••••••••">
                 </div>

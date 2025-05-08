@@ -24,27 +24,30 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name',
+        ], [
+            'name.unique' => 'Cette catégorie existe déjà.',
         ]);
-
+    
         Category::create([
             'name' => $request->name, 
         ]);
     
-        return redirect()->route('admin.categories.index');
+        return redirect()->route('admin.categories.index')->with('success', 'Catégorie créée avec succès.');
     }
-
-
+    
     public function update(Request $request, Category $category)
     {
         try {
             $request->validate([
-                'name' => 'required|string|max:255',
+                'name' => 'required|string|max:255|unique:categories,name,'.$category->id,
+            ], [
+                'name.unique' => 'Cette catégorie existe déjà.',
             ]);
-
+    
             $category->update(['name' => $request->name]);
             return redirect()->route('admin.categories.index')->with('success', 'Catégorie mise à jour avec succès.');
-
+    
         } catch (\Throwable $th) {
             return redirect()->route('admin.categories.index')->with('error', 'Une erreur s\'est produite lors de la mise à jour de la catégorie.');
         }

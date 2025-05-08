@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
 
      //manage employees
     Route::get('/employees/add', [EmployeeController::class, 'create'])->name('admin.employees.add')->middleware('role:admin');
-    Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('ajouter')->middleware('role:admin');
+    Route::post('/employees/ajouter', [EmployeeController::class, 'ajouter'])->name('admin.employees.store')->middleware('role:admin');
     Route::delete('/employees/delete/{id}', [EmployeeController::class, 'destroy'])->name('employee.destroy')->middleware('role:admin');
     Route::get('/admin/employees', [EmployeeController::class, 'index'])->name('admin.employees.index');
     Route::get('/employees/search', [EmployeeController::class, 'search']);

@@ -21,7 +21,8 @@ class ReservationController extends Controller
     {
         try {
             $now = now()->timezone(config('app.timezone'));
-            
+
+            // pour update à chaque fois les status des reservations
             Reservation::where('end_time', '<', $now)
                 ->whereNotIn('status', ['Done', 'Refused'])
                 ->update(['status' => 'Done']);
@@ -471,5 +472,87 @@ class ReservationController extends Controller
             default: return '#007BFF'; 
         }
     }
+
+        public function store2(StoreReservationRequest $request)
+    {
+        try {
+            if (!Auth::check()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous devez être connecté pour effectuer une réservation'
+                ], 401);
+            }
+
+            $client = Auth::user();
+            $service = Service::findOrFail($request->service_id);
+
+            // Vérification date/heure
+            $selectedDateTime = new DateTime($request->datetime);
+            $currentDateTime = new DateTime(); 
+
+            if ($selectedDateTime < $currentDateTime) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vous ne pouvez pas réserver un créneau dans le passé.'
+                ], 422);
+            }
+
+            // Calcul des horaires
+            $startTime = new DateTime($request->datetime);
+            $endTime = clone $startTime;
+            $endTime->add(new DateInterval('PT' . $service->duration . 'M'));
+
+            // Vérification disponibilité employé
+            $isEmployeeAvailable = !Reservation::where('employee_id', $request->employee_id)
+                ->where(function($query) use ($startTime, $endTime) {
+                    $query->whereBetween('datetime', [$startTime, $endTime])
+                        ->orWhereBetween('end_time', [$startTime, $endTime])
+                        ->orWhere(function($q) use ($startTime, $endTime) {
+                            $q->where('datetime', '<', $startTime)
+                                ->where('end_time', '>', $endTime);
+                        });
+                })
+                ->whereNotIn('status', ['cancelled', 'refused'])
+                ->exists();
+
+            if (!$isEmployeeAvailable) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cet employé est indisponible à cette heure. Veuillez choisir un autre créneau.',
+                    'service_id' => $request->service_id
+                ], 422);
+            }
+
+            // Création réservation
+            $reservation = Reservation::create([
+                'client_id' => $client->id,
+                'employee_id' => $request->employee_id,
+                'service_id' => $request->service_id,
+                'datetime' => $request->datetime,
+                'end_time' => $endTime->format('Y-m-d H:i:s'),
+                'status' => $request->status ?? 'pending', 
+            ]);
+
+            event(new ReservationCreated($reservation));
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Réservation créée avec succès',
+                'reservation' => $reservation
+            ]);
+
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Service non trouvé'
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
 
 }

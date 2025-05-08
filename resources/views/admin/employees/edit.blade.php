@@ -1,7 +1,7 @@
 @extends('layouts.admin.app')
 
 @section('content')
-    <!-- Top header -->
+<div class="flex flex-col min-h-screen">
     <header class="bg-white shadow-md sticky top-0 z-10">
         <div class="px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
             <div class="flex items-center">
@@ -20,156 +20,155 @@
                 </div>
 
                 <div class="relative">
-                    <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
-                        <span class="sr-only">Ouvrir le menu utilisateur</span>
-                        <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button">
+                    <button type="button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         <span class="sr-only">Ouvrir le menu utilisateur</span>
                         <div class="flex items-center">
-                        @if(Auth::user()->photo)
-                            <img class="h-8 w-8 rounded-full object-cover" 
-                                src="{{ asset('storage/' . Auth::user()->photo) }}" 
-                                alt="Photo de profil de {{ Auth::user()->name }}">
-                        @else
-                            <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                <i class="fas fa-user text-gray-500"></i>
-                            </div>
-                        @endif
+                            @if(Auth::user()->photo)
+                                <img class="h-8 w-8 rounded-full object-cover" 
+                                    src="{{ asset('storage/' . Auth::user()->photo) }}" 
+                                    alt="Photo de profil de {{ Auth::user()->name }}">
+                            @else
+                                <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                    <i class="fas fa-user text-gray-500"></i>
+                                </div>
+                            @endif
                             <span class="hidden md:block ml-2 text-gray-700">{{ Auth::user()->name }}</span>
                         </div>
-                    </button>
                     </button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main content -->
-    <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div class="bg-blue-50 p-6 border-b border-blue-100">
-                <h2 class="text-xl font-semibold text-blue-800">Éditer les informations de l'employé</h2>
-                <p class="text-blue-600 mt-1">Veuillez modifier les informations suivantes</p>
-            </div>
+    <main class="flex-grow">
+        <div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
 
-            @if ($errors->any())
-                <div class="alert text-red-600 m-2 ml-4">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                <div class="bg-blue-50 p-6 border-b border-blue-100">
+                    <h2 class="text-xl font-semibold text-blue-800">Éditer les informations de l'employé</h2>
+                    <p class="text-blue-600 mt-1">Veuillez modifier les informations suivantes</p>
                 </div>
-            @endif
 
-            @if(session('success'))
-                <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-400 text-green-700">
-                    <p>{{ session('success') }}</p>
-                </div>
-            @endif
-
-            <form action="{{ route('admin.employees.update', $employee->id) }}" method="POST" class="p-6">
-                @csrf
-                @method('PUT')
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Colonne gauche -->
-                    <div>
-                        <!-- Nom -->
-                        <div class="mb-6">
-                            <label for="name" class="block text-gray-800 font-bold mb-2">Nom complet</label>
-                            <input type="text" name="name" id="name" value="{{ old('name', $employee->name) }}" required
-                                class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        
-                        <!-- Email -->
-                        <div class="mb-6">
-                            <label for="email" class="block text-gray-800 font-bold mb-2">Adresse email</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-envelope text-gray-400"></i>
-                                </div>
-                                <input type="email" name="email" id="email" value="{{ old('email', $employee->email) }}" required
-                                    class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @if(session('success'))
+                    <div class="p-4 bg-green-50 border-l-4 border-green-400">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 text-green-500">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-green-700">{{ session('success') }}</p>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Colonne droite -->
-                    <div>
-                        <!-- Téléphone -->
-                        <div class="mb-6">
-                            <label for="phone" class="block text-gray-800 font-bold mb-2">Numéro de téléphone</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-phone text-gray-400"></i>
+                @endif
+
+
+                <form action="{{ route('admin.employees.update', $employee->id) }}" method="POST" class="p-6">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                        <div>
+
+                            <div class="mb-6">
+                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nom complet</label>
+                                <input type="text" name="name" id="name" value="{{ old('name', $employee->name) }}" 
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 @error('name') border-red-500 @enderror">
+                                @error('name')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="mb-6">
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Adresse email</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-envelope text-gray-400"></i>
+                                    </div>
+                                    <input type="email" name="email" id="email" value="{{ old('email', $employee->email) }}"
+                                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 @error('email') border-red-500 @enderror">
                                 </div>
-                                <input type="tel" name="phone" id="phone" value="{{ old('phone', $employee->phone) }}" required
-                                    class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                @error('email')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
-                        
-                        <!-- Rôle -->
-                        <div class="mb-6">
-                            <label for="role" class="block text-gray-800 font-bold mb-2">Rôle</label>
-                            <div class="relative">
-                                <select id="role" name="role" class="appearance-none w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                                    <option value="">Choisissez un rôle</option>
+
+                        <div>
+
+                            <div class="mb-6">
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Numéro de téléphone</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-phone text-gray-400"></i>
+                                    </div>
+                                    <input type="tel" name="phone" id="phone" value="{{ old('phone', $employee->phone) }}"
+                                        class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 @error('phone') border-red-500 @enderror">
+                                </div>
+                                @error('phone')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div class="mb-6">
+                                <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
+                                <select id="role" name="role" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md @error('role') border-red-500 @enderror">
+                                    <option value="">Sélectionnez un rôle</option>
                                     @foreach($roles as $role)
-                                        <option value="{{ $role->id }}" {{ $employee->roles->contains($role->id) ? 'selected' : '' }}>
+                                        <option value="{{ $role->id }}" {{ old('role', $employee->roles->first()?->id) == $role->id ? 'selected' : '' }}>
                                             {{ $role->name }}
                                         </option>
                                     @endforeach
                                 </select>
-                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                                    <i class="fas fa-chevron-down text-gray-400"></i>
-                                </div>
+                                @error('role')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- Services -->
-                <div class="mb-6 col-span-2">
-                    <label class="block text-gray-800 font-bold mb-2">Services associés</label>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                        @foreach($services as $service)
-                            <div class="flex items-center">
-                                <input type="checkbox" 
-                                    id="service_{{ $service->id }}" 
-                                    name="services[]" 
-                                    value="{{ $service->id }}"
-                                    class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                                    {{ in_array($service->id, old('services', $employeeServices ?? [])) ? 'checked' : '' }}>
-                                
-                                <label for="service_{{ $service->id }}" class="ml-2">
-                                    {{ $service->name }}
-                                    @if($service->category)
-                                        <span class="text-xs text-gray-500">({{ $service->category->name }})</span>
-                                    @endif
-                                </label>
-                            </div>
-                        @endforeach
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Services associés</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($services as $service)
+                                <div class="flex items-start">
+                                    <div class="flex items-center h-5">
+                                        <input type="checkbox" 
+                                            id="service_{{ $service->id }}" 
+                                            name="services[]" 
+                                            value="{{ $service->id }}"
+                                            class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded @error('services.*') border-red-500 @enderror"
+                                            {{ in_array($service->id, old('services', $employeeServices ?? [])) ? 'checked' : '' }}>
+                                    </div>
+                                    <div class="ml-3 text-sm">
+                                        <label for="service_{{ $service->id }}" class="font-medium text-gray-700">{{ $service->name }}</label>
+                                        @if($service->category)
+                                            <p class="text-xs text-gray-500">({{ $service->category->name }})</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        @error('services.*')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
-                    
-                    @error('services.*')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-                <!-- Ligne de séparation -->
-                <div class="border-t border-gray-200 mt-8 mb-6"></div>
-                
-                <!-- Buttons -->
-                <div class="flex justify-end space-x-4">
-                    <a href="{{ route('admin.employees.index') }}" class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition duration-200 font-medium">
-                        Annuler
-                    </a>
-                    <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
-                        <i class="fas fa-save mr-2"></i>
-                        Enregistrer 
-                    </button>
-                </div>
-            </form>
+
+                    <div class="border-t border-gray-200 my-6"></div>
+
+                    <div class="flex justify-end space-x-3">
+                        <a href="{{ route('admin.employees.index') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Annuler
+                        </a>
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            <i class="fas fa-save mr-2"></i>
+                            Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
+    </main>
 </div>
 @endsection

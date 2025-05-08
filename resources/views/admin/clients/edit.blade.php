@@ -77,7 +77,7 @@
                         <!-- Nom -->
                         <div class="mb-6">
                             <label for="name" class="block text-gray-800 font-bold mb-2">Nom complet</label>
-                            <input type="text" name="name" id="name" value="{{ old('name', $client->name) }}" required
+                            <input type="text" name="name" id="name" value="{{ old('name', $client->name) }}" 
                                 class="w-full px-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         
@@ -88,7 +88,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fas fa-envelope text-gray-400"></i>
                                 </div>
-                                <input type="email" name="email" id="email" value="{{ old('email', $client->email) }}" required
+                                <input type="text" name="email" id="email" value="{{ old('email', $client->email) }}" 
                                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
@@ -103,7 +103,7 @@
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <i class="fas fa-phone text-gray-400"></i>
                                 </div>
-                                <input type="tel" name="phone" id="phone" value="{{ old('phone', $client->phone) }}" required
+                                <input type="tel" name="phone" id="phone" value="{{ old('phone', $client->phone) }}" 
                                     class="w-full pl-10 pr-4 py-3 rounded-lg bg-gray-50 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
